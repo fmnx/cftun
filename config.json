@@ -1,0 +1,28 @@
+{
+  "cdn_ip": "104.20.6.78",
+  "host": "s02.dev",
+  "tunnels": [
+    {
+      "listen": "0.0.0.0:1200",
+      "path": "warp",
+      "protocol": "udp",
+      "timeout": 30
+    },
+    {
+      "listen": "0.0.0.0:22222",
+      "path": "ssh",
+      "protocol": "tcp"
+    },
+    {
+      "listen": "192.168.0.120:5203",
+      "host": "iperf3-u.s01.dev",
+      "protocol": "udp",
+      "timeout": 30
+    },
+    {
+      "listen": "192.168.0.120:5203",
+      "path": "iperf3-tcp",
+      "protocol": "tcp"
+    }
+  ]
+}
