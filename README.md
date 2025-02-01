@@ -3,7 +3,7 @@
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Cloudflare兼容版本](https://img.shields.io/badge/cloudflared-v2023.7.3-green)
 
-通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[fmnx/cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
+通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[修改版cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
 
 ## 📦 前置要求
 
