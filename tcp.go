@@ -61,9 +61,9 @@ func (t *TcpConnector) safeWrite(b []byte) (int, error) {
 
 func (t *TcpConnector) handleUpstream() {
 	buf := bufferPool.Get().([]byte)
-	defer bufferPool.Put(buf)
-	defer t.Close()
 	defer t.wsConn.Close()
+	defer t.Close()
+	defer bufferPool.Put(buf)
 	for !t.closed {
 		nr, err := t.conn.Read(buf)
 		if err != nil {
@@ -89,9 +89,9 @@ func (t *TcpConnector) handleUpstream() {
 
 func (t *TcpConnector) handleDownstream() {
 	buf := bufferPool.Get().([]byte)
-	defer bufferPool.Put(buf)
-	defer t.Close()
 	defer t.conn.Close()
+	defer t.Close()
+	defer bufferPool.Put(buf)
 	for !t.closed {
 		nr, err := t.wsConn.Read(buf)
 		if err != nil {
