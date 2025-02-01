@@ -164,6 +164,6 @@ func tcpListen(listenAddr, cfIp, host, path string) {
 			}
 			log.Fatalln(err.Error())
 		}
-		handleTcp(ws, conn)
+		go handleTcp(ws, conn)
 	}
 }
