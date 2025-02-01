@@ -63,13 +63,10 @@ func main() {
 		log.Fatalln("Failed to parse config file: ", err.Error())
 	}
 
-	// ./wstun
-
 	for _, tunnel := range rawConfig.Tunnels {
 		host := rawConfig.Host
 		if tunnel.Host != "" {
 			host = tunnel.Host
-			println(host)
 		}
 		switch tunnel.Protocol {
 		case "udp":
@@ -77,6 +74,7 @@ func main() {
 		case "tcp":
 			go tcpListen(tunnel.Listen, rawConfig.CdnIp, host, tunnel.Path)
 		default:
+			go tcpListen(tunnel.Listen, rawConfig.CdnIp, host, tunnel.Path)
 		}
 	}
 

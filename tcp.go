@@ -125,7 +125,7 @@ func (t *TcpConnector) handleDownstream() {
 	}
 }
 
-func tcpListen(listenAddr, cfIp, host, protocol string) {
+func tcpListen(listenAddr, cfIp, host, path string) {
 	var dialer *net.Dialer
 	// 绑定连接cloudflare服务器的网卡
 	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
@@ -153,7 +153,7 @@ func tcpListen(listenAddr, cfIp, host, protocol string) {
 
 	errChan := make(chan error)
 
-	ws := NewWebsocket(dialer, cfIp, host, protocol)
+	ws := NewWebsocket(dialer, cfIp, host, path)
 
 	for {
 		conn, err := tcpListener.Accept()

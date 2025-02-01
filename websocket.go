@@ -15,7 +15,7 @@ type Websocket struct {
 	headers  http.Header
 }
 
-func NewWebsocket(dialer *net.Dialer, cfIp, host, protocol string) *Websocket {
+func NewWebsocket(dialer *net.Dialer, cfIp, host, path string) *Websocket {
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig: nil,
 		Proxy:           http.ProxyFromEnvironment,
@@ -40,7 +40,7 @@ func NewWebsocket(dialer *net.Dialer, cfIp, host, protocol string) *Websocket {
 	return &Websocket{
 		wsDialer: wsDialer,
 		headers:  headers,
-		host:     fmt.Sprintf("wss://%s/%s", host, protocol),
+		host:     fmt.Sprintf("wss://%s/%s", host, path),
 	}
 
 }

@@ -48,7 +48,7 @@ var (
 )
 
 // Listen on addr.
-func udpListen(listenAddr, cfIp, host, protocol string, udpTimeout int) {
+func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 	var dialer *net.Dialer
 	// 绑定连接cloudflare服务器的网卡
 	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
@@ -88,7 +88,7 @@ func udpListen(listenAddr, cfIp, host, protocol string, udpTimeout int) {
 
 	log.Infoln("UDP listen on %s\n", listenAddr)
 
-	ws := NewWebsocket(dialer, cfIp, host, protocol)
+	ws := NewWebsocket(dialer, cfIp, host, path)
 
 	for {
 		buf := udpBufPool.Get().([]byte)
