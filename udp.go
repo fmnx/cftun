@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/fmnx/cftun/log"
-	"github.com/gorilla/websocket"
 	"net"
 	"runtime"
 	"strings"
@@ -201,14 +200,10 @@ func (c *Connector) handleRemote() {
 		buf := udpBufPool.Get().([]byte)
 		n, err := c.ReadFromRemote(buf)
 		if err != nil {
-			if e, ok := err.(*websocket.CloseError); ok && e.Code == 1006 {
-				c.closed = true
-				c.udpConns.Delete(c.clientAddr.String())
-				_ = c.remote.Close()
-				return
-			}
-			//log.Errorln(err.Error())
-			continue
+			c.closed = true
+			c.udpConns.Delete(c.clientAddr.String())
+			_ = c.remote.Close()
+			return
 		}
 
 		// Send data to outbound queue
