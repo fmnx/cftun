@@ -100,14 +100,23 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 		}
 
 		conn := udpConns[clientAddr.String()]
+
 		if conn == nil {
-			conn = NewConn(ws, listener, clientAddr, udpTimeout, outboundQueue)
-			if conn == nil {
-				udpBufPool.Put(buf)
-				continue
-			}
-			udpConns[clientAddr.String()] = conn
+			go func() {
+				conn = NewConn(ws, listener, clientAddr, udpTimeout, outboundQueue)
+				if conn == nil {
+					udpBufPool.Put(buf)
+					return
+				}
+				udpConns[clientAddr.String()] = conn
+				conn.inboundQueue <- &InboundData{
+					len: n,
+					buf: buf,
+				}
+			}()
+			continue
 		}
+
 		// Process inbound data
 		conn.inboundQueue <- &InboundData{
 			len: n,
@@ -123,7 +132,7 @@ func (c *Connector) processInboundQueue() {
 		buf := data.buf
 
 		if _, err := c.remote.Write(buf[:n]); err != nil {
-			log.Errorln("Error writing to remote: %v", err)
+			//log.Errorln("Error writing to remote: %v", err)
 		}
 
 		udpBufPool.Put(buf)
@@ -176,10 +185,10 @@ func (c *Connector) healthCheck() {
 	for {
 		if time.Now().After(c.lastTime.Add(c.timeOut * time.Second)) {
 			log.Infoln("%s -> %s closed.", c.clientAddr.String(), c.listener.LocalAddr().String())
+			close(c.inboundQueue)
 			c.closed = true
 			_ = c.remote.Close()
 			delete(udpConns, c.clientAddr.String())
-			close(c.inboundQueue)
 			return
 		}
 		time.Sleep(c.timeOut * time.Second)
