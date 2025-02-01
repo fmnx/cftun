@@ -11,7 +11,7 @@ import (
 
 type Websocket struct {
 	wsDialer *websocket.Dialer
-	host     string
+	url      string
 	headers  http.Header
 }
 
@@ -40,13 +40,13 @@ func NewWebsocket(dialer *net.Dialer, cfIp, host, path string) *Websocket {
 	return &Websocket{
 		wsDialer: wsDialer,
 		headers:  headers,
-		host:     fmt.Sprintf("wss://%s/%s", host, path),
+		url:      fmt.Sprintf("wss://%s/%s", host, path),
 	}
 
 }
 
 func (w *Websocket) createWebsocketStream() (net.Conn, error) {
-	wsConn, resp, err := w.wsDialer.Dial(w.host, w.headers)
+	wsConn, resp, err := w.wsDialer.Dial(w.url, w.headers)
 
 	defer func(resp *http.Response) {
 		if resp == nil {
