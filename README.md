@@ -8,7 +8,7 @@
 ## 📦 前置要求
 
 - 此处默认您已知悉如何在cloudflare web控制台配置tunnel
-- 若要支持UDP，cloudflared续使用修改版：https://github.com/fmnx/cloudflared
+- 若要支持UDP，cloudflared需使用[修改版cloudflared](https://github.com/fmnx/cloudflared),并在控制台选择RDP
 
 ## 🛠️ 安装步骤
 
@@ -21,33 +21,34 @@ go build
 
 ### 2. 配置文件
     - 配置文件中全局host搭配tunnel path使用，也可为tunnel独立设置host
+    - 由于web控制台没有UDP选项，使用UDP协议请在web控制台选择RDP代替
 ```json5
 {
   "cdn_ip": "104.20.20.20",           // 可选，手动指定的Cloudflare Anycast IP
-  "host": "tunnel.s01.dev",           // 必填，tunnel默认域名
-  "tunnels": [                        // 必填，配置隧道信息
+  "host": "tunnel.s01.dev",           // 必填，全局host
+  "tunnels": [                        
     {                                 // 通过独立host定位
-      "listen": "127.0.0.1:2222",     // 必填，本地监听地址
-      "protocol": "tcp",              // 必填，支持tcp/udp
-      "host": "ssh.s01.dev",          // 可选，URL路径标识
+      "listen": "127.0.0.1:2222",    
+      "protocol": "tcp",              
+      "host": "ssh.s01.dev",         
     },
     {                                 // 通过独立host+path定位
-      "listen": "127.0.0.1:2223",     // 必填，本地监听地址
-      "protocol": "tcp",              // 必填，支持tcp/udp
-      "host": "s02.dev",              // 可选，URL路径标识
+      "listen": "127.0.0.1:2223",     
+      "protocol": "tcp",             
+      "host": "s02.dev",              
       "path": "ssh2"
     },
     {                                 // 通过全局host+path定位
-      "listen": "127.0.0.1:5201",     // 必填，本地监听地址
-      "protocol": "tcp",              // 必填，支持tcp/udp
-      "path": "iperf3-tcp",           // 可选，URL路径标识
-      "timeout": 30                   // 可选，UDP空闲超时(秒)
+      "listen": "127.0.0.1:5201",     
+      "protocol": "tcp",             
+      "path": "iperf3-tcp",         
+      "timeout": 30                   
     },
     {                                 // 通过全局host+path定位
-      "listen": "127.0.0.1:5201",     // 必填，本地监听地址
-      "protocol": "udp",              // 必填，支持tcp/udp
-      "path": "iperf3-udp",           // 可选，URL路径标识
-      "timeout": 30                   // 可选，UDP空闲超时(秒)
+      "listen": "127.0.0.1:5201",     
+      "protocol": "udp",             
+      "path": "iperf3-udp",           
+      "timeout": 30                  
     },
   ]                   
 }
