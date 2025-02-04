@@ -18,13 +18,13 @@ var bufferPool = sync.Pool{
 }
 
 type TcpConnector struct {
-	ws     *Websocket
-	wsConn net.Conn
-	conn   net.Conn
-	cache  []byte // 缓存最后一次发送的数据
-	closed bool
-	newWS  bool
-	mu     sync.Mutex
+	ws          *Websocket
+	wsConn      net.Conn
+	conn        net.Conn
+	cache       []byte // 缓存最后一次发送的数据
+	closed      bool
+	reConnected bool
+	mu          sync.Mutex
 }
 
 func handleTcp(ws *Websocket, conn net.Conn) {
@@ -34,11 +34,11 @@ func handleTcp(ws *Websocket, conn net.Conn) {
 		return
 	}
 	tcpConnector := &TcpConnector{
-		ws:     ws,
-		wsConn: wsConn,
-		conn:   conn,
-		closed: false,
-		newWS:  false,
+		ws:          ws,
+		wsConn:      wsConn,
+		conn:        conn,
+		closed:      false,
+		reConnected: false,
 	}
 	tcpConnector.handle()
 }
@@ -72,10 +72,14 @@ func (t *TcpConnector) handleUpstream() {
 		}
 		nw, ew := t.safeWrite(buf[:nr])
 		if ew != nil || nw != nr {
-			t.newWS = true
+			wsConn, re := t.ws.createWebsocketStream()
+			if re != nil {
+				break
+			}
+			t.reConnected = true
 			_ = t.wsConn.Close()
-			log.Infoln("handleUpstream: recreate Websocket connection.")
-			t.wsConn, _ = t.ws.createWebsocketStream()
+			t.wsConn = wsConn
+			log.Infoln("handleUpstream: WebSocket has reconnected.")
 			nw, ew = t.safeWrite(buf[:nr])
 			if ew != nil || nw != nr {
 				break
@@ -95,14 +99,14 @@ func (t *TcpConnector) handleDownstream() {
 	for !t.closed {
 		nr, err := t.wsConn.Read(buf)
 		if err != nil {
-			if t.newWS {
+			if t.reConnected {
 				time.Sleep(10 * time.Millisecond)
-				t.newWS = false
+				t.reConnected = false
 				continue
 			}
 			if e, ok := err.(*websocket.CloseError); ok {
 				if e.Code == 1006 && !t.closed {
-					log.Infoln("handleDownstream: recreate Websocket connection...")
+					log.Infoln("handleDownstream: WebSocket has reconnected.")
 					t.wsConn, err = t.ws.createWebsocketStream()
 					if err != nil {
 						break
