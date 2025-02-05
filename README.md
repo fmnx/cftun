@@ -8,7 +8,7 @@
 ## 📦 前置要求
 
 - 此处默认您已知悉如何在cloudflare web控制台配置tunnel
-- 若要支持UDP，cloudflared需使用[修改版cloudflared](https://github.com/fmnx/cloudflared),并在控制台选择RDP
+- 若要支持UDP，cloudflared需使用[修改版](https://github.com/fmnx/cloudflared),并在控制台选择RDP
 
 ## 🛠️ 安装步骤
 
