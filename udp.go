@@ -23,19 +23,19 @@ type InboundData struct {
 type OutboundData struct {
 	len        int
 	buf        []byte
+	listener   net.PacketConn
 	clientAddr net.Addr
 }
 
 type Connector struct {
-	listener      net.PacketConn
-	clientAddr    net.Addr
-	remote        net.Conn
-	lastTime      time.Time
-	timeOut       time.Duration
-	closed        bool
-	inboundQueue  chan *InboundData
-	outboundQueue chan *OutboundData
-	udpConns      *sync.Map
+	listener     net.PacketConn
+	clientAddr   net.Addr
+	remote       net.Conn
+	lastTime     time.Time
+	timeOut      time.Duration
+	closed       bool
+	inboundQueue chan *InboundData
+	udpConns     *sync.Map
 }
 
 var (
@@ -44,7 +44,16 @@ var (
 			return make([]byte, UdpBufSize)
 		},
 	}
+	outboundQueue = make(chan *OutboundData, OutboundQueueSize)
 )
+
+func init() {
+	cpus := runtime.NumCPU()
+	// Use goroutines to process outbound queue concurrently
+	for i := 0; i < cpus; i++ {
+		go processOutboundQueue()
+	}
+}
 
 // Listen on addr.
 func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
@@ -77,14 +86,6 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 		}
 	}(listener)
 
-	cpus := runtime.NumCPU()
-	outboundQueue := make(chan *OutboundData, OutboundQueueSize)
-
-	// Use goroutines to process outbound queue concurrently
-	for i := 0; i < cpus; i++ {
-		go processOutboundQueue(listener, outboundQueue)
-	}
-
 	log.Infoln("UDP listen on %s\n", listenAddr)
 
 	ws := NewWebsocket(dialer, cfIp, host, path)
@@ -108,8 +109,8 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 			continue
 		}
 
-		go func(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, outboundQueue chan *OutboundData, udpConns *sync.Map) {
-			conn := NewConn(ws, listener, clientAddr, udpTimeout, outboundQueue, udpConns)
+		go func(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, udpConns *sync.Map) {
+			conn := NewConn(ws, listener, clientAddr, udpTimeout, udpConns)
 			if conn == nil {
 				udpBufPool.Put(buf)
 				return
@@ -119,7 +120,7 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 				len: n,
 				buf: buf,
 			}
-		}(ws, listener, clientAddr, udpTimeout, outboundQueue, udpConns)
+		}(ws, listener, clientAddr, udpTimeout, udpConns)
 
 	}
 }
@@ -139,10 +140,11 @@ func (c *Connector) processInboundQueue() {
 }
 
 // Process outbound queue and send data
-func processOutboundQueue(listener net.PacketConn, outboundQueue chan *OutboundData) {
+func processOutboundQueue() {
 	for data := range outboundQueue {
 		n := data.len
 		buf := data.buf
+		listener := data.listener
 		clientAddr := data.clientAddr
 
 		// Write data to client
@@ -153,22 +155,21 @@ func processOutboundQueue(listener net.PacketConn, outboundQueue chan *OutboundD
 	}
 }
 
-func NewConn(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, outboundQueue chan *OutboundData, udpConns *sync.Map) *Connector {
+func NewConn(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, udpConns *sync.Map) *Connector {
 	remote, err := ws.createWebsocketStream()
 	if err != nil {
 		log.Errorln(err.Error())
 		return nil
 	}
 	connector := &Connector{
-		listener:      listener,
-		clientAddr:    clientAddr,
-		remote:        remote,
-		lastTime:      time.Now(),
-		timeOut:       time.Duration(udpTimeout),
-		closed:        false,
-		inboundQueue:  make(chan *InboundData, InboundQueueSize),
-		outboundQueue: outboundQueue,
-		udpConns:      udpConns,
+		listener:     listener,
+		clientAddr:   clientAddr,
+		remote:       remote,
+		lastTime:     time.Now(),
+		timeOut:      time.Duration(udpTimeout),
+		closed:       false,
+		inboundQueue: make(chan *InboundData, InboundQueueSize),
+		udpConns:     udpConns,
 	}
 	go connector.handleRemote()
 	go connector.healthCheck()
@@ -207,9 +208,10 @@ func (c *Connector) handleRemote() {
 		}
 
 		// Send data to outbound queue
-		c.outboundQueue <- &OutboundData{
+		outboundQueue <- &OutboundData{
 			len:        n,
 			buf:        buf,
+			listener:   c.listener,
 			clientAddr: c.clientAddr,
 		}
 	}
