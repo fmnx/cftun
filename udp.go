@@ -21,21 +21,21 @@ type InboundData struct {
 }
 
 type OutboundData struct {
-	len        int
-	buf        []byte
-	listener   net.PacketConn
-	clientAddr net.Addr
+	len      int
+	buf      []byte
+	srcAddr  net.Addr
+	listener net.PacketConn
 }
 
 type Connector struct {
 	listener     net.PacketConn
-	clientAddr   net.Addr
-	remote       net.Conn
-	lastTime     time.Time
-	timeOut      time.Duration
-	closed       bool
-	inboundQueue chan *InboundData
+	srcAddr      net.Addr
+	remoteConn   net.Conn
 	udpConns     *sync.Map
+	inboundQueue chan *InboundData
+	lastRecvTime time.Time
+	idleTimeout  time.Duration
+	closed       bool
 }
 
 var (
@@ -94,14 +94,14 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 
 	for {
 		buf := udpBufPool.Get().([]byte)
-		n, clientAddr, err := listener.ReadFrom(buf)
+		n, srcAddr, err := listener.ReadFrom(buf)
 		if err != nil {
 			udpBufPool.Put(buf)
 			log.Errorln(err.Error())
 			continue
 		}
 
-		if conn, ok := udpConns.Load(clientAddr.String()); ok {
+		if conn, ok := udpConns.Load(srcAddr.String()); ok {
 			conn.(*Connector).inboundQueue <- &InboundData{
 				len: n,
 				buf: buf,
@@ -109,18 +109,18 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 			continue
 		}
 
-		go func(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, udpConns *sync.Map) {
-			conn := NewConn(ws, listener, clientAddr, udpTimeout, udpConns)
+		go func(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeout int, udpConns *sync.Map) {
+			conn := NewConn(ws, listener, srcAddr, udpTimeout, udpConns)
 			if conn == nil {
 				udpBufPool.Put(buf)
 				return
 			}
-			udpConns.Store(clientAddr.String(), conn)
+			udpConns.Store(srcAddr.String(), conn)
 			conn.inboundQueue <- &InboundData{
 				len: n,
 				buf: buf,
 			}
-		}(ws, listener, clientAddr, udpTimeout, udpConns)
+		}(ws, listener, srcAddr, udpTimeout, udpConns)
 
 	}
 }
@@ -131,7 +131,7 @@ func (c *Connector) processInboundQueue() {
 		n := data.len
 		buf := data.buf
 
-		if _, err := c.remote.Write(buf[:n]); err != nil {
+		if _, err := c.remoteConn.Write(buf[:n]); err != nil {
 			//log.Errorln("Error writing to remote: %v", err)
 		}
 
@@ -145,17 +145,17 @@ func processOutboundQueue() {
 		n := data.len
 		buf := data.buf
 		listener := data.listener
-		clientAddr := data.clientAddr
+		srcAddr := data.srcAddr
 
 		// Write data to client
-		if _, err := listener.WriteTo(buf[:n], clientAddr); err != nil {
-			log.Errorln("Error writing to client %v: %v", clientAddr, err)
+		if _, err := listener.WriteTo(buf[:n], srcAddr); err != nil {
+			log.Errorln("Error writing to client %v: %v", srcAddr, err)
 		}
 		udpBufPool.Put(buf)
 	}
 }
 
-func NewConn(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTimeout int, udpConns *sync.Map) *Connector {
+func NewConn(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeout int, udpConns *sync.Map) *Connector {
 	remote, err := ws.createWebsocketStream()
 	if err != nil {
 		log.Errorln(err.Error())
@@ -163,10 +163,10 @@ func NewConn(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTim
 	}
 	connector := &Connector{
 		listener:     listener,
-		clientAddr:   clientAddr,
-		remote:       remote,
-		lastTime:     time.Now(),
-		timeOut:      time.Duration(udpTimeout),
+		srcAddr:      srcAddr,
+		remoteConn:   remote,
+		lastRecvTime: time.Now(),
+		idleTimeout:  time.Duration(udpTimeout),
 		closed:       false,
 		inboundQueue: make(chan *InboundData, InboundQueueSize),
 		udpConns:     udpConns,
@@ -178,21 +178,21 @@ func NewConn(ws *Websocket, listener net.PacketConn, clientAddr net.Addr, udpTim
 }
 
 func (c *Connector) ReadFromRemote(b []byte) (n int, err error) {
-	c.lastTime = time.Now()
-	return c.remote.Read(b)
+	c.lastRecvTime = time.Now()
+	return c.remoteConn.Read(b)
 }
 
 func (c *Connector) healthCheck() {
 	for {
-		if time.Now().After(c.lastTime.Add(c.timeOut * time.Second)) {
-			//log.Infoln("UDP: %s -> %s closed.", c.clientAddr.String(), c.listener.LocalAddr().String())
+		if time.Now().After(c.lastRecvTime.Add(c.idleTimeout * time.Second)) {
+			//log.Infoln("UDP: %s -> %s closed.", c.srcAddr.String(), c.listener.LocalAddr().String())
 			close(c.inboundQueue)
 			c.closed = true
-			_ = c.remote.Close()
-			c.udpConns.Delete(c.clientAddr.String())
+			_ = c.remoteConn.Close()
+			c.udpConns.Delete(c.srcAddr.String())
 			return
 		}
-		time.Sleep(c.timeOut * time.Second)
+		time.Sleep(c.idleTimeout * time.Second)
 	}
 }
 
@@ -202,17 +202,17 @@ func (c *Connector) handleRemote() {
 		n, err := c.ReadFromRemote(buf)
 		if err != nil {
 			c.closed = true
-			c.udpConns.Delete(c.clientAddr.String())
-			_ = c.remote.Close()
+			c.udpConns.Delete(c.srcAddr.String())
+			_ = c.remoteConn.Close()
 			return
 		}
 
 		// Send data to outbound queue
 		outboundQueue <- &OutboundData{
-			len:        n,
-			buf:        buf,
-			listener:   c.listener,
-			clientAddr: c.clientAddr,
+			len:      n,
+			buf:      buf,
+			listener: c.listener,
+			srcAddr:  c.srcAddr,
 		}
 	}
 }
