@@ -109,7 +109,7 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 			continue
 		}
 
-		go func(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeout int, udpConns *sync.Map) {
+		go func(srcAddr net.Addr) {
 			conn := NewConn(ws, listener, srcAddr, udpTimeout, udpConns)
 			if conn == nil {
 				udpBufPool.Put(buf)
@@ -120,7 +120,7 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 				len: n,
 				buf: buf,
 			}
-		}(ws, listener, srcAddr, udpTimeout, udpConns)
+		}(srcAddr)
 
 	}
 }
