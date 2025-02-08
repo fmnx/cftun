@@ -156,7 +156,7 @@ func processOutboundQueue() {
 }
 
 func NewConn(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeout int, udpConns *sync.Map) *Connector {
-	remote, err := ws.createWebsocketStream()
+	remoteConn, err := ws.createWebsocketStream()
 	if err != nil {
 		log.Errorln(err.Error())
 		return nil
@@ -164,7 +164,7 @@ func NewConn(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeou
 	connector := &Connector{
 		listener:     listener,
 		srcAddr:      srcAddr,
-		remoteConn:   remote,
+		remoteConn:   remoteConn,
 		lastRecvTime: time.Now(),
 		idleTimeout:  time.Duration(udpTimeout),
 		closed:       false,

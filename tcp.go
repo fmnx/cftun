@@ -106,11 +106,11 @@ func (t *TcpConnector) handleDownstream() {
 			}
 			if e, ok := err.(*websocket.CloseError); ok {
 				if e.Code == 1006 && !t.closed {
-					log.Infoln("handleDownstream: WebSocket has reconnected.")
 					t.wsConn, err = t.ws.createWebsocketStream()
 					if err != nil {
 						break
 					}
+					log.Infoln("handleDownstream: WebSocket has reconnected.")
 					n, err := t.safeWrite(t.cache)
 					if err != nil || n != len(t.cache) {
 						break
