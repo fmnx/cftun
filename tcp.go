@@ -4,7 +4,6 @@ import (
 	"github.com/fmnx/cftun/log"
 	"github.com/gorilla/websocket"
 	"net"
-	"strings"
 	"sync"
 	"time"
 )
@@ -130,22 +129,6 @@ func (t *TcpConnector) handleDownstream() {
 }
 
 func tcpListen(listenAddr, cfIp, host, path string) {
-	var dialer *net.Dialer
-	// 绑定连接cloudflare服务器的网卡
-	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
-
-		localIP, _, _ := net.SplitHostPort(listenAddr)
-		localAddr := &net.TCPAddr{
-			IP:   net.ParseIP(localIP),
-			Port: 0, // 端口设为 0，系统自动分配
-		}
-
-		dialer = &net.Dialer{
-			LocalAddr: localAddr,
-			Timeout:   3 * time.Second, // 设置连接超时时间
-		}
-	}
-
 	// 监听指定网卡源地址
 	tcpListener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
@@ -157,7 +140,7 @@ func tcpListen(listenAddr, cfIp, host, path string) {
 
 	errChan := make(chan error)
 
-	ws := NewWebsocket(dialer, cfIp, host, path)
+	ws := NewWebsocket(listenAddr, cfIp, host, path)
 
 	for {
 		conn, err := tcpListener.Accept()

@@ -7,6 +7,8 @@ import (
 	"github.com/gorilla/websocket"
 	"net"
 	"net/http"
+	"strings"
+	"time"
 )
 
 type Websocket struct {
@@ -15,14 +17,23 @@ type Websocket struct {
 	headers  http.Header
 }
 
-func NewWebsocket(dialer *net.Dialer, cfIp, host, path string) *Websocket {
+func NewWebsocket(listenAddr, cfIp, host, path string) *Websocket {
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig: nil,
 		Proxy:           http.ProxyFromEnvironment,
 	}
 	dial := net.Dial
-	if dialer != nil {
-		dial = dialer.Dial
+	// 绑定监听地址对应的网卡出口
+	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
+		localIP, _, _ := net.SplitHostPort(listenAddr)
+		localAddr := &net.TCPAddr{
+			IP:   net.ParseIP(localIP),
+			Port: 0,
+		}
+		dial = (&net.Dialer{
+			LocalAddr: localAddr,
+			Timeout:   5 * time.Second,
+		}).Dial
 	}
 
 	wsDialer.NetDial = func(network, addr string) (net.Conn, error) {

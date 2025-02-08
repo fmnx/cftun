@@ -1,16 +1,17 @@
 {
-  "cdn_ip": "172.67.75.172",
+  "cdn_ip": "104.17.143.163",
   "host": "s02.dev",
   "tunnels": [
     {
-      "listen": "0.0.0.0:1200",
-      "path": "warp",
+      "listen": "192.168.0.120:1200",
+      "host": "warp.s02.dev",
       "protocol": "udp",
       "timeout": 30
     },
     {
       "listen": "0.0.0.0:22222",
       "path": "ssh",
+      "host": "s01.dev",
       "protocol": "tcp"
     },
     {
@@ -21,6 +22,7 @@
     },
     {
       "listen": "192.168.0.120:5203",
+      "host": "s01.dev",
       "path": "iperf3-tcp",
       "protocol": "tcp"
     }

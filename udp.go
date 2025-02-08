@@ -4,7 +4,6 @@ import (
 	"github.com/fmnx/cftun/log"
 	"net"
 	"runtime"
-	"strings"
 	"sync"
 	"time"
 )
@@ -57,22 +56,6 @@ func init() {
 
 // Listen on addr.
 func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
-	var dialer *net.Dialer
-	// 绑定连接cloudflare服务器的网卡
-	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
-
-		localIP, _, _ := net.SplitHostPort(listenAddr)
-		localAddr := &net.TCPAddr{
-			IP:   net.ParseIP(localIP),
-			Port: 0, // 端口设为 0，系统自动分配
-		}
-
-		dialer = &net.Dialer{
-			LocalAddr: localAddr,
-			Timeout:   5 * time.Second, // 设置连接超时时间
-		}
-	}
-
 	// 监听指定网卡源地址
 	listener, err := net.ListenPacket("udp", listenAddr)
 	if err != nil {
@@ -88,7 +71,7 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 
 	log.Infoln("UDP listen on %s\n", listenAddr)
 
-	ws := NewWebsocket(dialer, cfIp, host, path)
+	ws := NewWebsocket(listenAddr, cfIp, host, path)
 
 	udpConns := &sync.Map{}
 
