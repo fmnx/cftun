@@ -48,15 +48,9 @@ func NewWebsocket(dialer *net.Dialer, cfIp, host, path string) *Websocket {
 func (w *Websocket) createWebsocketStream() (net.Conn, error) {
 	wsConn, resp, err := w.wsDialer.Dial(w.url, w.headers)
 
-	defer func(resp *http.Response) {
-		if resp == nil {
-			return
-		}
-		err = resp.Body.Close()
-		if err != nil {
-			log.Errorln(err.Error())
-		}
-	}(resp)
+	if resp != nil && resp.Body != nil {
+		_ = resp.Body.Close()
+	}
 
 	if err != nil {
 		log.Errorln(err.Error())
