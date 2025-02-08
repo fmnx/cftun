@@ -62,12 +62,7 @@ func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
 		log.Errorln("UDP listen error: %v\n", err)
 		return
 	}
-	defer func(clientPC net.PacketConn) {
-		err = clientPC.Close()
-		if err != nil {
-			println(err.Error())
-		}
-	}(listener)
+	defer listener.Close()
 
 	log.Infoln("UDP listen on %s\n", listenAddr)
 

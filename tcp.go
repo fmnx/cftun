@@ -43,7 +43,6 @@ func handleTcp(ws *Websocket, conn net.Conn) {
 }
 
 func (t *TcpConnector) handle() {
-	//go Relay(t.ws, t.conn)
 	go t.handleDownstream()
 	go t.handleUpstream()
 }
