@@ -2,10 +2,8 @@ package client
 
 import (
 	"github.com/fmnx/cftun/log"
-	"github.com/gorilla/websocket"
 	"net"
 	"sync"
-	"time"
 )
 
 const defaultBufferSize = 16 * 1024
@@ -20,7 +18,6 @@ type TcpConnector struct {
 	ws          *Websocket
 	wsConn      net.Conn
 	conn        net.Conn
-	cache       []byte // 缓存最后一次发送的数据
 	closed      bool
 	reConnected bool
 	mu          sync.Mutex
@@ -70,21 +67,9 @@ func (t *TcpConnector) handleUpstream() {
 		}
 		nw, ew := t.safeWrite(buf[:nr])
 		if ew != nil || nw != nr {
-			wsConn, re := t.ws.createWebsocketStream()
-			if re != nil {
-				break
-			}
-			t.reConnected = true
-			_ = t.wsConn.Close()
-			t.wsConn = wsConn
-			log.Infoln("handleUpstream: WebSocket has reconnected.")
-			nw, ew = t.safeWrite(buf[:nr])
-			if ew != nil || nw != nr {
-				break
-			}
+			break
 			//log.Infoln("handleUpstream: Write to remote failed.")
 		}
-		t.cache = buf[:nr]
 	}
 	return
 }
@@ -97,26 +82,6 @@ func (t *TcpConnector) handleDownstream() {
 	for !t.closed {
 		nr, err := t.wsConn.Read(buf)
 		if err != nil {
-			if t.reConnected {
-				time.Sleep(10 * time.Millisecond)
-				t.reConnected = false
-				continue
-			}
-			if e, ok := err.(*websocket.CloseError); ok {
-				if e.Code == 1006 && !t.closed {
-					t.wsConn, err = t.ws.createWebsocketStream()
-					if err != nil {
-						break
-					}
-					log.Infoln("handleDownstream: WebSocket has reconnected.")
-					n, err := t.safeWrite(t.cache)
-					if err != nil || n != len(t.cache) {
-						break
-					}
-					continue
-				}
-			}
-			//log.Infoln("handleDownstream: %s", err.Error())
 			break
 		}
 		nw, ew := t.conn.Write(buf[:nr])
