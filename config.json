@@ -1,5 +1,5 @@
 {
-  "server-config": {
+  "server": {
     "token": "",
     "edge-ips": [
       "198.41.192.77:7844",
@@ -10,7 +10,7 @@
     "ha-conn": 4,
     "bind-address": ""
   },
-  "client-config": {
+  "client": {
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",

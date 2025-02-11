@@ -29,8 +29,8 @@ go build
 
 配置文件为 JSON 格式，主要包含以下两个部分：
 
-- **server-config**：服务端相关配置
-- **client-config**：客户端相关配置
+- **server**：服务端相关配置
+- **client**：客户端相关配置
 
 ### 1. 服务端配置 (`server-config`)
 
@@ -81,7 +81,7 @@ go build
 
 ```json
 {
-  "server-config": {
+  "server": {
     "token": "",
     "edge-ips": [
       "198.41.192.77:7844",
@@ -92,7 +92,7 @@ go build
     "ha-conn": 4,
     "bind-address": ""
   },
-  "client-config": {
+  "client": {
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",

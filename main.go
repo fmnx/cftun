@@ -14,8 +14,8 @@ import (
 )
 
 type RawConfig struct {
-	ServerConfig *server.Config `yaml:"server-config" json:"server-config"`
-	ClientConfig *client.Config `yaml:"client-config" json:"client-config"`
+	Server *server.Config `yaml:"server" json:"server"`
+	Client *client.Config `yaml:"client" json:"client"`
 }
 
 func parseConfig(configFile string) (*RawConfig, error) {
@@ -56,8 +56,13 @@ func main() {
 		log.Fatalln("Failed to parse config file: ", err.Error())
 	}
 
-	rawConfig.ClientConfig.Run()
-	rawConfig.ServerConfig.Run()
+	if rawConfig.Client != nil {
+		rawConfig.Client.Run()
+	}
+
+	if rawConfig.Server != nil {
+		rawConfig.Server.Run()
+	}
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
