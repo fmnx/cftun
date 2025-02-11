@@ -8,7 +8,7 @@
 通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[修改版cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
 
 ## 📦 前置要求
-
+- 如果需要自行编译，必须使用[Cloudflare Golang环境](https://github.com/cloudflare/go)
 - 此处默认您已知悉如何在cloudflare web控制台配置tunnel
 - 由于控制台目前不支持设置UDP，控制台请选择RDP代替
 
