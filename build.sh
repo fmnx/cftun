@@ -3,6 +3,7 @@
 set -e  # 发生错误时退出
 
 APP_NAME="cftun"
+VERSION="2.0.0"
 BUILD_DIR="build"
 PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
 
@@ -20,7 +21,9 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     fi
 
     echo "Building for $OS/$ARCH..."
-    env GOOS=$OS GOARCH=$ARCH go build -o $BUILD_DIR/$OUTPUT_NAME
+    LDFLAGS="-X main.version=$VERSION -X main.buildDate=\"$(date '+%Y-%m-%d')\" -X main.platform=$PLATFORM-$ARCH"
+
+    env GOOS=$OS GOARCH=$ARCH go build -ldflags "$LDFLAGS" -o $BUILD_DIR/$OUTPUT_NAME
 
     # 压缩文件
     if [ "$OS" == "windows" ]; then

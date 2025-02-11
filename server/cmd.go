@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"sync"
 	"time"
 
@@ -118,7 +119,7 @@ func RunCommand(c *cli.Context) error {
 		return sc.runWithCredentials(token.Credentials())
 	}
 
-	return cliutil.UsageError("Provided Tunnel token is not valid.")
+	return errors.New("provided Tunnel token is not valid")
 }
 
 func ParseToken(tokenStr string) (*connection.TunnelToken, error) {

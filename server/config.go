@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
-	"github.com/fmnx/cftun/log"
 	"github.com/urfave/cli/v2"
 	"os"
 )
@@ -46,12 +45,8 @@ func (server *Config) Run() {
 		},
 	}
 
-	err := app.Run([]string{
+	_ = app.Run([]string{
 		os.Args[0],
 		"run",
 	})
-	if err != nil {
-		log.Errorln(err.Error())
-		return
-	}
 }
