@@ -1,6 +1,6 @@
 {
   "server-config": {
-    "token": "eyJhIjoiMzg2YTljYzQ3MWU3NDRlNzk0NmY4NTkxMjg0ODUyMDEiLCJ0IjoiNTUzNzgxYzUtNDIxMy00ODVhLWEyMWItMTBiYmU3M2JjMzQzIiwicyI6Ik56ZG1OV00zWkdFdFpEVm1PUzAwWTJNNUxUaGpZbUl0TkRsbVpHTmlOalZpTXpJMiJ9",
+    "token": "",
     "edge-ips": [
       "198.41.192.77:7844",
       "198.41.197.78:7844",
