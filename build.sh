@@ -4,7 +4,7 @@ set -e  # 发生错误时退出
 
 APP_NAME="cftun"
 BUILD_DIR="build"
-PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64")
+PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
 
 # 创建 build 目录
 mkdir -p $BUILD_DIR
