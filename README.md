@@ -32,7 +32,7 @@ go build
 - **server**：服务端相关配置
 - **client**：客户端相关配置
 
-### 1. 服务端配置 (`server-config`)
+### 1. 服务端配置 (`server`)
 
 - **token**  
   用于服务端认证的令牌，控制台创建隧道后生成的token。
@@ -47,7 +47,7 @@ go build
 - **bind-address** (可选)  
   指定服务端出口网卡的 IP 地址。如无特殊需求建议留空
 
-### 2. 客户端配置 (`client-config`)
+### 2. 客户端配置 (`client`)
 
 - **cdn-ip** (可选)  
   优选 Cloudflare Anycast IP，如果不设置则解析url中的域名。
