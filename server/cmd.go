@@ -5,10 +5,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"github.com/cloudflare/cloudflared/edgediscovery"
+	"github.com/cloudflare/cloudflared/ingress"
+	"github.com/cloudflare/cloudflared/logger"
+	"github.com/cloudflare/cloudflared/management"
+	"github.com/google/uuid"
 	"sync"
 	"time"
 
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
+	cfdflags "github.com/cloudflare/cloudflared/cmd/cloudflared/flags"
 	"github.com/cloudflare/cloudflared/connection"
 	"github.com/cloudflare/cloudflared/orchestration"
 	"github.com/cloudflare/cloudflared/signal"
@@ -19,6 +25,7 @@ import (
 
 var (
 	graceShutdownC chan struct{}
+	buildInfo      *cliutil.BuildInfo
 )
 
 func StartServer(
@@ -26,7 +33,6 @@ func StartServer(
 	namedTunnel *connection.TunnelProperties,
 	log *zerolog.Logger,
 ) error {
-	info := &cliutil.BuildInfo{}
 	var wg sync.WaitGroup
 	errC := make(chan error)
 
@@ -36,13 +42,40 @@ func StartServer(
 	connectedSignal := signal.New(make(chan struct{}))
 	observer := connection.NewObserver(log, nil)
 
-	tunnelConfig, orchestratorConfig, err := prepareTunnelConfig(ctx, c, info, log, observer, namedTunnel)
+	tunnelConfig, orchestratorConfig, err := prepareTunnelConfig(ctx, c, buildInfo, log, observer, namedTunnel)
 	if err != nil {
 		log.Err(err).Msg("Couldn't start tunnel")
 		return err
 	}
 
-	orchestrator, err := orchestration.NewOrchestrator(ctx, orchestratorConfig, tunnelConfig.Tags, nil, tunnelConfig.Log)
+	serviceIP := c.String("service-op-ip")
+	if edgeAddrs, err := edgediscovery.ResolveEdge(log, tunnelConfig.Region, tunnelConfig.EdgeIPVersion); err == nil {
+		if serviceAddr, err := edgeAddrs.GetAddrForRPC(); err == nil {
+			serviceIP = serviceAddr.TCP.String()
+		}
+	}
+
+	var clientID uuid.UUID
+	if tunnelConfig.NamedTunnel != nil {
+		clientID, err = uuid.FromBytes(tunnelConfig.NamedTunnel.Client.ClientID)
+		if err != nil {
+			// set to nil for classic tunnels
+			clientID = uuid.Nil
+		}
+	}
+
+	mgmt := management.New(
+		c.String("management-hostname"),
+		c.Bool("management-diagnostics"),
+		serviceIP,
+		clientID,
+		c.String(cfdflags.ConnectorLabel),
+		logger.ManagementLogger.Log,
+		logger.ManagementLogger,
+	)
+	internalRules := []ingress.Rule{ingress.NewManagementRule(mgmt)}
+
+	orchestrator, err := orchestration.NewOrchestrator(ctx, orchestratorConfig, tunnelConfig.Tags, internalRules, tunnelConfig.Log)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ set -e  # 发生错误时退出
 
 APP_NAME="cftun"
 VERSION="2.0.0"
+BUILD_TYPE="release"
 BUILD_DIR="build"
 PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
 
@@ -21,7 +22,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     fi
 
     echo "Building for $OS/$ARCH..."
-    LDFLAGS="-X main.version=$VERSION -X main.buildDate=\"$(date '+%Y-%m-%d')\" -X main.platform=$PLATFORM-$ARCH"
+    LDFLAGS="-X main.Version=$VERSION -X main.BuildDate=$(date '+%Y-%m-%d_%H:%M:%S_%Z') -X main.BuildType=$BUILD_TYPE"
 
     env GOOS=$OS GOARCH=$ARCH go build -ldflags "$LDFLAGS" -o $BUILD_DIR/$OUTPUT_NAME
 

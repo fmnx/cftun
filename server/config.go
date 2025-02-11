@@ -13,13 +13,17 @@ type Config struct {
 	BindAddress string   `yaml:"bind-address" json:"bind-address"`
 }
 
-func (server *Config) Run() {
+func (server *Config) Run(info *cliutil.BuildInfo) {
+	buildInfo = info
+
 	if server.HaConn == 0 {
 		server.HaConn = 4
 	}
 
 	app := &cli.App{}
 	app.Flags = []cli.Flag{}
+
+	hostname, _ := os.Hostname()
 	app.Commands = []*cli.Command{
 		{
 			Name:   "run",
@@ -40,6 +44,21 @@ func (server *Config) Run() {
 				&cli.StringFlag{
 					Name:  "bind-address",
 					Value: server.BindAddress,
+				},
+				&cli.StringFlag{
+					Name:  "origin-server-name",
+					Value: hostname,
+				},
+				&cli.StringFlag{
+					Name:  "service-op-ip",
+					Value: "198.41.200.113:80",
+				},
+				&cli.StringFlag{
+					Name:  "management-hostname",
+					Value: "management.argotunnel.com",
+				}, &cli.BoolFlag{
+					Name:  "management-diagnostics",
+					Value: true,
 				},
 			},
 		},

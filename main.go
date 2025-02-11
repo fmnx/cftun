@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
 	"github.com/fmnx/cftun/client"
 	"github.com/fmnx/cftun/log"
 	"github.com/fmnx/cftun/server"
@@ -39,13 +40,14 @@ func parseConfig(configFile string) (*RawConfig, error) {
 }
 
 var (
-	configFile  string
-	token       string
-	version     = "unknown"
-	buildDate   = "unknown"
-	platform    = "unknown"
-	showVersion bool
-	githubURL   = "https://github.com/fmnx/cftun" // GitHub 地址
+	configFile         string
+	token              string
+	Version            = "unknown"
+	BuildDate          = "unknown"
+	BuildType          = "DEV"
+	CloudflaredVersion = "2025.2.0"
+	showVersion        bool
+	githubURL          = "https://github.com/fmnx/cftun" // GitHub 地址
 )
 
 func init() {
@@ -67,8 +69,9 @@ func init() {
 }
 
 func main() {
+	bInfo := cliutil.GetBuildInfo(BuildType, CloudflaredVersion)
 	if showVersion {
-		printVersion()
+		printVersion(bInfo)
 		return
 	}
 	if token != "" {
@@ -78,7 +81,7 @@ func main() {
 			HaConn:      4,
 			BindAddress: "",
 		}
-		svr.Run()
+		svr.Run(bInfo)
 	} else {
 		rawConfig, err := parseConfig(configFile)
 		if err != nil {
@@ -90,7 +93,7 @@ func main() {
 		}
 
 		if rawConfig.Server != nil {
-			rawConfig.Server.Run()
+			rawConfig.Server.Run(bInfo)
 		}
 	}
 
@@ -99,6 +102,7 @@ func main() {
 	<-sigCh
 }
 
-func printVersion() {
-	fmt.Printf("Version: %s\nBuild Date: %s\nPlatform: %s\n", version, buildDate, platform)
+func printVersion(buildInfo *cliutil.BuildInfo) {
+	fmt.Printf("GoOS: %s\nGoArch: %s\nGoVersion: %s\nBuildType: %s\nCftunVersion: %s\nBuildDate: %s\nChecksum: %s\n",
+		buildInfo.GoOS, buildInfo.GoArch, buildInfo.GoVersion, buildInfo.BuildType, Version, BuildDate, buildInfo.Checksum)
 }
