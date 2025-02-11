@@ -1,7 +1,8 @@
 # Cloudflare Tunnel 代理服务
 
-[![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![Cloudflare兼容版本](https://img.shields.io/badge/cloudflared-v2025.2.0-green)
+[![GitHub License](https://img.shields.io/badge/license-Apache%202.0-blue.svg
+)](https://opensource.org/licenses/Apache-2.0)
+![Cloudflare兼容版本(https://img.shields.io/badge/cloudflared-v2025.2.0-green)](https://opensource.org/licenses/Apache-2.0)
 
 通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[修改版cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
 
