@@ -15,6 +15,10 @@ type Config struct {
 }
 
 func (server *Config) Run() {
+	if server.HaConn == 0 {
+		server.HaConn = 4
+	}
+
 	app := &cli.App{}
 	app.Flags = []cli.Flag{}
 	app.Commands = []*cli.Command{
