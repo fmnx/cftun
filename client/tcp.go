@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"github.com/fmnx/cftun/log"
@@ -127,7 +127,7 @@ func (t *TcpConnector) handleDownstream() {
 	}
 }
 
-func tcpListen(listenAddr, cfIp, host, path string) {
+func TcpListen(listenAddr, cfIp, url, scheme string, port int) {
 	// 监听指定网卡源地址
 	tcpListener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
@@ -135,11 +135,11 @@ func tcpListen(listenAddr, cfIp, host, path string) {
 		return
 	}
 	defer tcpListener.Close()
-	log.Infoln("TCP listen on %s\n", listenAddr)
+	log.Infoln("TCP listen on %s", listenAddr)
 
 	errChan := make(chan error)
 
-	ws := NewWebsocket(listenAddr, cfIp, host, path)
+	ws := NewWebsocket(listenAddr, cfIp, url, scheme, port)
 
 	for {
 		conn, err := tcpListener.Accept()

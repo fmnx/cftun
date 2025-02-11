@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"github.com/fmnx/cftun/log"
@@ -54,19 +54,19 @@ func init() {
 	}
 }
 
-// Listen on addr.
-func udpListen(listenAddr, cfIp, host, path string, udpTimeout int) {
+// UdpListen on addr.
+func UdpListen(listenAddr, cfIp, url, scheme string, port, udpTimeout int) {
 	// 监听指定网卡源地址
 	listener, err := net.ListenPacket("udp", listenAddr)
 	if err != nil {
-		log.Errorln("UDP listen error: %v\n", err)
+		log.Errorln("UDP listen error: %v", err)
 		return
 	}
 	defer listener.Close()
 
-	log.Infoln("UDP listen on %s\n", listenAddr)
+	log.Infoln("UDP listen on %s", listenAddr)
 
-	ws := NewWebsocket(listenAddr, cfIp, host, path)
+	ws := NewWebsocket(listenAddr, cfIp, url, scheme, port)
 
 	udpConns := &sync.Map{}
 

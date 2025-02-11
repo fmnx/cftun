@@ -8,7 +8,7 @@
 ## 📦 前置要求
 
 - 此处默认您已知悉如何在cloudflare web控制台配置tunnel
-- 若要支持UDP，cloudflared需使用[修改版](https://github.com/fmnx/cloudflared),并在控制台选择RDP
+- 由于控制台目前不支持设置UDP，控制台请选择RDP代替
 
 ## 🛠️ 安装步骤
 
@@ -19,38 +19,106 @@ cd cftun
 go build
 ```
 
-### 2. 配置文件
-    - 配置文件中全局host搭配tunnel path使用，也可为tunnel独立设置host
-    - 由于web控制台没有UDP选项，使用UDP协议请在web控制台选择RDP代替
-```json5
+# Tunnel 服务配置说明
+
+本文档介绍了如何使用 JSON 配置文件来部署 Tunnel 隧道服务。配置文件分为两大部分：服务端配置和客户端配置，用户可以根据自己的需求进行调整。
+
+---
+
+## 配置文件结构
+
+配置文件为 JSON 格式，主要包含以下两个部分：
+
+- **server-config**：服务端相关配置
+- **client-config**：客户端相关配置
+
+### 1. 服务端配置 (`server-config`)
+
+- **token**  
+  用于服务端认证的令牌，控制台创建隧道后复制。
+
+- **edge-ips** (可选)  
+  指定服务端优选 IP 列表，建议范围为 `198.41.192.0` 至 `198.41.207.255`，标准端口为 `7844`。此项可以用来设置优质线路并支持中转非标准端口。
+
+- **ha-conn** (可选)  
+  高可用 QUIC 连接数，根据网络环境进行适当配置。
+
+- **bind-address** (可选)  
+  指定服务端出口网卡的 IP 地址。
+
+### 2. 客户端配置 (`client-config`)
+
+- **cdn-ip** (可选)  
+  优选 Cloudflare Anycast IP，用于 CDN 加速。
+
+- **cdn-port** (可选)  
+  CDN 的端口设置。对于 WebSocket，ws 默认端口为 `80`，wss 默认端口为 `443`，也可使用优质线路中转非标准端口。
+
+- **scheme** (可选)  
+  协议方案，支持 `ws` 或 `wss`，使用非标准端口时需根据实际情况设置。
+
+- **tunnels** (可选)  
+  隧道配置列表，每个隧道包含以下配置：
+
+    - **listen** (必选)  
+      本地监听地址及端口，用于接收流量。
+
+    - **url** (必选)  
+      控制台设置的 URL（如果存在 path，请一并填写）。
+
+    - **protocol** (必选)  
+      指定本地监听端口使用的协议，支持 `tcp` 或 `udp`。
+
+    - **timeout** (可选)  
+      UDP 连接的超时时间（单位：秒），默认为 60 秒，如需调整可单独配置。
+
+---
+
+## 示例配置文件
+
+以下是一个示例配置文件，您可以直接复制并根据实际需求进行修改：
+
+```json
 {
-  "cdn_ip": "104.20.20.20",           // 可选，手动指定的Cloudflare Anycast IP
-  "host": "tunnel.s01.dev",           // 必填，全局host
-  "tunnels": [                        
-    {                                 // 通过独立host定位
-      "listen": "127.0.0.1:2222",    
-      "protocol": "tcp",              
-      "host": "ssh.s01.dev",         
-    },
-    {                                 // 通过独立host+path定位
-      "listen": "127.0.0.1:2223",     
-      "protocol": "tcp",             
-      "host": "s02.dev",              
-      "path": "ssh2"
-    },
-    {                                 // 通过全局host+path定位
-      "listen": "127.0.0.1:5201",     
-      "protocol": "tcp",             
-      "path": "iperf3-tcp",         
-      "timeout": 30                   
-    },
-    {                                 // 通过全局host+path定位
-      "listen": "127.0.0.1:5201",     
-      "protocol": "udp",             
-      "path": "iperf3-udp",           
-      "timeout": 30                  
-    },
-  ]                   
+  "server-config": {
+    "token": "",
+    "edge-ips": [
+      "198.41.192.77:7844",
+      "198.41.197.78:7844",
+      "198.41.202.79:7844",
+      "198.41.207.80:7844"
+    ],
+    "ha-conn": 4,
+    "bind-address": "192.168.0.120"
+  },
+  "client-config": {
+    "cdn-ip": "104.17.143.163",
+    "cdn-port": 80,
+    "scheme": "ws",
+    "tunnels": [
+      {
+        "listen": "127.0.0.1:2408",
+        "url": "warp.qzzz.io",
+        "protocol": "udp",
+        "timeout": 30
+      },
+      {
+        "listen": "127.0.0.1:2222",
+        "url": "ssh.qzzz.io",
+        "protocol": "tcp"
+      },
+      {
+        "listen": "127.0.0.1:5201",
+        "url": "iperf3.qzzz.io/udp",
+        "protocol": "udp",
+        "timeout": 30
+      },
+      {
+        "listen": "127.0.0.1:5201",
+        "url": "iperf3.qzzz.io/tcp",
+        "protocol": "tcp"
+      }
+    ]
+  }
 }
 ```
-

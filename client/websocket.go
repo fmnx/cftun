@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"fmt"
@@ -17,7 +17,8 @@ type Websocket struct {
 	headers  http.Header
 }
 
-func NewWebsocket(listenAddr, cfIp, host, path string) *Websocket {
+func NewWebsocket(listenAddr, cfIp, url, scheme string, port int) *Websocket {
+	host := strings.Split(url, "/")[0]
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig: nil,
 		Proxy:           http.ProxyFromEnvironment,
@@ -39,7 +40,7 @@ func NewWebsocket(listenAddr, cfIp, host, path string) *Websocket {
 	wsDialer.NetDial = func(network, addr string) (net.Conn, error) {
 		// 连接指定的 IP 地址而不是解析域名
 		if cfIp != "" {
-			return dial(network, fmt.Sprintf("%s:443", cfIp))
+			return dial(network, fmt.Sprintf("%s:%d", cfIp, port))
 		}
 		return dial(network, addr)
 	}
@@ -51,7 +52,7 @@ func NewWebsocket(listenAddr, cfIp, host, path string) *Websocket {
 	return &Websocket{
 		wsDialer: wsDialer,
 		headers:  headers,
-		url:      fmt.Sprintf("wss://%s/%s", host, path),
+		url:      fmt.Sprintf("%s://%s", scheme, url),
 	}
 
 }

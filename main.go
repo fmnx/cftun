@@ -4,25 +4,18 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/fmnx/cftun/client"
 	"github.com/fmnx/cftun/log"
+	"github.com/fmnx/cftun/server"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 )
 
-type Tunnel struct {
-	Listen   string `yaml:"listen" json:"listen"`
-	Host     string `yaml:"host" json:"host"`
-	Path     string `yaml:"path" json:"path"`
-	Protocol string `yaml:"protocol" json:"protocol"`
-	Timeout  int    `yaml:"timeout" json:"timeout"`
-}
-
 type RawConfig struct {
-	CdnIp   string   `yaml:"cdn_ip" json:"cdn_ip"`
-	Host    string   `yaml:"host" json:"host"`
-	Tunnels []Tunnel `yaml:"tunnels" json:"tunnels"`
+	ServerConfig *server.Config `yaml:"server-config" json:"server-config"`
+	ClientConfig *client.Config `yaml:"client-config" json:"client-config"`
 }
 
 func parseConfig(configFile string) (*RawConfig, error) {
@@ -63,20 +56,8 @@ func main() {
 		log.Fatalln("Failed to parse config file: ", err.Error())
 	}
 
-	for _, tunnel := range rawConfig.Tunnels {
-		host := rawConfig.Host
-		if tunnel.Host != "" {
-			host = tunnel.Host
-		}
-		switch tunnel.Protocol {
-		case "udp":
-			go udpListen(tunnel.Listen, rawConfig.CdnIp, host, tunnel.Path, tunnel.Timeout)
-		case "tcp":
-			go tcpListen(tunnel.Listen, rawConfig.CdnIp, host, tunnel.Path)
-		default:
-			go tcpListen(tunnel.Listen, rawConfig.CdnIp, host, tunnel.Path)
-		}
-	}
+	rawConfig.ClientConfig.Run()
+	rawConfig.ServerConfig.Run()
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
