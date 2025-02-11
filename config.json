@@ -8,7 +8,7 @@
       "198.41.207.80:7844"
     ],
     "ha-conn": 4,
-    "bind-address": "192.168.0.120"
+    "bind-address": ""
   },
   "client-config": {
     "cdn-ip": "104.17.143.163",
