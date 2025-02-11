@@ -15,12 +15,11 @@ var bufferPool = sync.Pool{
 }
 
 type TcpConnector struct {
-	ws          *Websocket
-	wsConn      net.Conn
-	conn        net.Conn
-	closed      bool
-	reConnected bool
-	mu          sync.Mutex
+	ws     *Websocket
+	wsConn net.Conn
+	conn   net.Conn
+	closed bool
+	mu     sync.Mutex
 }
 
 func handleTcp(ws *Websocket, conn net.Conn) {
@@ -30,11 +29,10 @@ func handleTcp(ws *Websocket, conn net.Conn) {
 		return
 	}
 	tcpConnector := &TcpConnector{
-		ws:          ws,
-		wsConn:      wsConn,
-		conn:        conn,
-		closed:      false,
-		reConnected: false,
+		ws:     ws,
+		wsConn: wsConn,
+		conn:   conn,
+		closed: false,
 	}
 	tcpConnector.handle()
 }
