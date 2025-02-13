@@ -48,9 +48,20 @@ jobs:
           echo "go version: $(go version)"
           ./build.sh
 
-      - name: Upload artifacts
+      - name: List build files
+        run: |
+          echo "files=$(ls build/ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        file: ${{ fromJson(needs.build.outputs.files) }}
+    steps:
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: build/*.*
+          name: ${{ matrix.file }}
+          path: build/${{ matrix.file }}
           retention-days: 1
