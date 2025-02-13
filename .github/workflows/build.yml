@@ -45,7 +45,7 @@ jobs:
 
       - name: Build with build.sh
         env:
-          PATH: ${{ github.workspace }}/go/bin:${{ env.PATH }}
+          PATH: ${{ github.workspace }}/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${{ env.PATH }}
         run: |
           echo "GOROOT: ${{ env.GOROOT }}"
           echo "PATH: ${{ env.PATH }}"
