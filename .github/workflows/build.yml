@@ -21,10 +21,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/go-cloudflare
-          key: ${{ runner.os }}-cloudflare-go-binary-${{ env.CF_GO_VERSION }}
+            ${{ github.workspace }}/go
+          key: ${{ runner.os }}-cloudflare-go-${{ env.CF_GO_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-cloudflare-go-binary-
+            ${{ runner.os }}-cloudflare-go-
 
       - name: Set up Go
         if: steps.cache-go.outputs.cache-hit != 'true'
