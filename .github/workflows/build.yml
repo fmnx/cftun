@@ -47,8 +47,7 @@ jobs:
         
       - name: Build with build.sh
         run: |
-          echo "go version: $(go version)"
-          echo "GOPATH: $GOPATH"
+          go env
           ./build.sh
 
       - name: List build files
