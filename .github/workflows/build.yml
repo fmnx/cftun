@@ -60,12 +60,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: |
-            build/cftun-linux-amd64.tar.gz
-            build/cftun-linux-arm64.tar.gz
-            build/cftun-linux-arm.tar.gz
-            build/cftun-windows-amd64.zip
-            build/cftun-windows-arm64.zip
-            build/cftun-darwin-amd64.tar.gz
-            build/cftun-darwin-arm64.tar.gz
+          path: build
           retention-days: 1
