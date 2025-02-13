@@ -22,9 +22,9 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/go
-          key: ${{ runner.os }}-cloudflare-go-${{ env.CF_GO_VERSION }}
+          key: ${{ runner.os }}-cf-go-${{ env.CF_GO_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-cloudflare-go-
+            ${{ runner.os }}-cf-go-
 
       - name: Set up Go
         if: steps.cache-go.outputs.cache-hit != 'true'
@@ -44,7 +44,6 @@ jobs:
       - name: Build with build.sh
         env:
           GOBIN: ${{ github.workspace }}/go/bin
-          GOPATH: ${{ github.workspace }}/go
           GOROOT: ${{ github.workspace }}/go
         run: |
           echo "go version: $(go version)"
