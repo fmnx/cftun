@@ -44,11 +44,8 @@ jobs:
           cd $GITHUB_WORKSPACE
 
       - name: Build with build.sh
-        env:
-          PATH: ${{ github.workspace }}/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${{ env.PATH }}
         run: |
-          echo "GOROOT: ${{ env.GOROOT }}"
-          echo "PATH: ${{ env.PATH }}"
+          echo $GITHUB_WORKSPACE/go/bin >> $GITHUB_PATH
           echo "go version: $(go version)"
           ./build.sh
 
