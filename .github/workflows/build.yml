@@ -52,7 +52,7 @@ jobs:
       - name: Build with build.sh
         env:
           GOROOT: ${{ env.GOROOT }}
-          PATH: ${{ env.GOROOT }}/bin:${{ env.PATH }}
+          PATH: ${{ env.GOROOT }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${{ env.PATH }}
         run: |
           echo "GOROOT: ${{ env.GOROOT }}"
           echo "PATH: ${{ env.PATH }}"
