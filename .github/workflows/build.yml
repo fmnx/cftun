@@ -43,16 +43,9 @@ jobs:
           ./make.bash
           cd $GITHUB_WORKSPACE
 
-      - name: Setup Cloudflare Go Path
-        run: |
-          echo "$GITHUB_WORKSPACE/go/bin" >> $GITHUB_PATH
-          echo "GOROOT=$GITHUB_WORKSPACE/go" >> $GITHUB_ENV
-          $GITHUB_WORKSPACE/go/bin/go version
-
       - name: Build with build.sh
         env:
-          GOROOT: ${{ env.GOROOT }}
-          PATH: ${{ env.GOROOT }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${{ env.PATH }}
+          PATH: ${{ github.workspace }}/go/bin:${{ env.PATH }}
         run: |
           echo "GOROOT: ${{ env.GOROOT }}"
           echo "PATH: ${{ env.PATH }}"
