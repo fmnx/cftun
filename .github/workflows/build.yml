@@ -30,7 +30,7 @@ jobs:
         if: steps.cache-go.outputs.cache-hit != 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.22'
 
       - name: Build and Install Cloudflare Go
         if: steps.cache-go.outputs.cache-hit != 'true'
