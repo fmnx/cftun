@@ -24,7 +24,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     echo "Building for $OS/$ARCH..."
     LDFLAGS="-X main.Version=$VERSION -X main.BuildDate=$(date '+%Y-%m-%d_%H:%M:%S_%Z') -X main.BuildType=$BUILD_TYPE"
 
-    env GOOS=$OS GOARCH=$ARCH go build -ldflags "$LDFLAGS" -o $BUILD_DIR/$OUTPUT_NAME
+    env GOOS=$OS GOARCH=$ARCH $GOBIN/go build -ldflags "$LDFLAGS" -o $BUILD_DIR/$OUTPUT_NAME
 
     # 压缩文件
     if [ "$OS" == "windows" ]; then
