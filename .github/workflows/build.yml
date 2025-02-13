@@ -55,7 +55,6 @@ jobs:
           PATH: ${{ env.GOROOT }}/bin:${{ env.PATH }}
         run: |
           echo "go version: $(go version)"
-          chmod +x ./build.sh
           ./build.sh
 
       - name: Upload artifacts
