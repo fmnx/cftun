@@ -44,8 +44,9 @@ jobs:
           cd $GITHUB_WORKSPACE
 
       - name: Build with build.sh
+        env:
+          GOBIN: ${{ github.workspace }}/go/bin
         run: |
-          echo $GITHUB_WORKSPACE/go/bin >> $GITHUB_PATH
           echo "go version: $(go version)"
           ./build.sh
 
