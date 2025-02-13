@@ -54,6 +54,8 @@ jobs:
           GOROOT: ${{ env.GOROOT }}
           PATH: ${{ env.GOROOT }}/bin:${{ env.PATH }}
         run: |
+          echo "GOROOT: ${{ env.GOROOT }}"
+          echo "PATH: ${{ env.PATH }}"
           echo "go version: $(go version)"
           ./build.sh
 
