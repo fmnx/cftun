@@ -24,7 +24,7 @@ jobs:
             ${{ github.workspace }}/go
           key: ${{ runner.os }}-cf-go-${{ env.CF_GO_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-cf-go-
+            ${{ runner.os }}-cf-go
 
       - name: Set up Go
         if: steps.cache-go.outputs.cache-hit != 'true'
