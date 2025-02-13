@@ -46,11 +46,12 @@ jobs:
         run: |
           echo "$GITHUB_WORKSPACE/go/bin" >> $GITHUB_PATH
           echo "GOROOT=$GITHUB_WORKSPACE/go" >> $GITHUB_ENV
-          go version
+          $GITHUB_WORKSPACE/go/bin/go version
 
       - name: Build with build.sh
         env:
           GOROOT: ${{ env.GOROOT }}
+          PATH: ${{ env.GOROOT }}/bin:${{ env.PATH }}
         run: |
           chmod +x ./build.sh
           ./build.sh
