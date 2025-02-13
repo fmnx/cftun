@@ -40,10 +40,12 @@ jobs:
           echo "CF_GO_VERSION=$(git rev-parse HEAD)" >> $GITHUB_ENV
           cd src
           ./make.bash
-          cd ..
-          sudo cp -f bin/go $(which go)
 
       - name: Build with build.sh
+        env:
+          GOBIN: ${{ github.workspace }}/go/bin
+          GOPATH: ${{ github.workspace }}/go
+          GOROOT: ${{ github.workspace }}/go
         run: |
           echo "go version: $(go version)"
           ./build.sh
