@@ -8,23 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        artifact:
-          - cftun-linux-amd64
-          - cftun-linux-arm64
-          - cftun-linux-arm
-          - cftun-windows-amd64
-          - cftun-windows-arm64
-          - cftun-darwin-amd64
-          - cftun-darwin-arm64
-          - cftun-linux-amd64.tar.gz
-          - cftun-linux-arm64.tar.gz
-          - cftun-linux-arm.tar.gz
-          - cftun-windows-amd64.zip
-          - cftun-windows-arm64.zip
-          - cftun-darwin-amd64.tar.gz
-          - cftun-darwin-arm64.tar.gz
     permissions:
       contents: write
       packages: write
@@ -76,6 +59,13 @@ jobs:
       - name: Upload build files
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: build/${{ matrix.artifact }}
+          name: build-artifacts
+          path: |
+            build/cftun-linux-amd64.tar.gz
+            build/cftun-linux-arm64.tar.gz
+            build/cftun-linux-arm.tar.gz
+            build/cftun-windows-amd64.zip
+            build/cftun-windows-arm64.zip
+            build/cftun-darwin-amd64.tar.gz
+            build/cftun-darwin-arm64.tar.gz
           retention-days: 1
