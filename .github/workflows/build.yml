@@ -11,6 +11,9 @@ jobs:
     permissions:
       contents: write
       packages: write
+    env:
+      CFTUN_VERSION: "2.0.1"
+      CF_GO_VERSION: "1.22.5"
 
     steps:
       - name: Cache Cloudflare Go
@@ -19,7 +22,7 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/go
-          key: ${{ runner.os }}-cf-go-1.22.5
+          key: ${{ runner.os }}-cf-go-${{ env.CF_GO_VERSION }}
           restore-keys: |
             ${{ runner.os }}-cf-go
 
@@ -27,7 +30,7 @@ jobs:
         if: steps.cache-go.outputs.cache-hit != 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: ${{ env.CF_GO_VERSION }}
           
       - name: Build and Install Cloudflare Go
         if: steps.cache-go.outputs.cache-hit != 'true'
@@ -50,7 +53,7 @@ jobs:
         with:
           path: |
             ${{ github.workspace }}/gopath/pkg/mod
-          key: ${{ runner.os }}-deps-1.23
+          key: ${{ runner.os }}-deps-${{ env.CFTUN_VERSION }}
           restore-keys: |
             ${{ runner.os }}-deps
 
