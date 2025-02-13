@@ -8,6 +8,11 @@ BUILD_TYPE="product"
 BUILD_DIR="build"
 PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
 
+if [ -z "$GOBIN" ]; then
+    echo "GOBIN is not set"
+    GOBIN=$(go env GOROOT)/bin
+fi
+
 # 创建 build 目录
 mkdir -p $BUILD_DIR
 
