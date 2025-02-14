@@ -2,7 +2,7 @@ module github.com/fmnx/cftun
 
 go 1.22.5
 
-replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => github.com/fmnx/cloudflared v1.0.2
+replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => github.com/fmnx/cloudflared v1.0.3
 
 replace github.com/urfave/cli/v2 v2.3.0 => github.com/ipostelnik/cli/v2 v2.3.1-0.20210324024421-b6ea8234fe3d
 

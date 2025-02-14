@@ -50,6 +50,7 @@ go build
 - **bind-address** (可选)  
   指定服务端出口网卡的 IP 地址。如无特殊需求建议留空
 
+
 ### 2. 客户端配置 (`client`)
 
 - **cdn-ip** (可选)  
@@ -61,14 +62,20 @@ go build
 - **scheme** (可选)  
   协议方案，支持 `ws` 或 `wss`，使用非标准端口时需根据实际情况设置。
 
+- **global-url** (可选)
+  Tunnel控制台配置路径，如果存在 path，请一并填写
+
 - **tunnels** (可选)  
   隧道配置列表，每个隧道包含以下配置：
 
     - **listen** (必选)  
       本地监听地址及端口, 建议使用127.0.0.1。
 
-    - **url** (必选)  
-      控制台设置的 URL（如果存在 path，请一并填写）。
+    - **remote** (可选)
+      转发到指定的目标地址(留空则使用控制台配置的目标地址)
+
+    - **url** (可选)  
+      优先使用该项配置(留空则使用`global-url`)。
 
     - **protocol** (必选)  
       指定本地监听端口使用的协议，支持 `tcp` 或 `udp`。
@@ -80,8 +87,7 @@ go build
 
 ## 示例配置文件
 
-以下是一个示例配置文件，您可以直接复制并根据实际需求进行修改：
-
+以下是server示例配置文件，您可以直接复制并根据实际需求进行修改：
 ```json
 {
   "server": {
@@ -94,11 +100,54 @@ go build
     ],
     "ha-conn": 4,
     "bind-address": ""
-  },
+  }
+}
+```
+
+以下是client使用`global-url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+```json
+{
   "client": {
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",
+    "global-url": "tunnel.qzzz.io",
+    "tunnels": [
+      {
+        "listen": "127.0.0.1:2408",
+        "remote": "162.159.192.1:2408",
+        "protocol": "udp",
+        "timeout": 30
+      },
+      {
+        "listen": "127.0.0.1:2222",
+        "remote": "127.0.0.1:22",
+        "protocol": "tcp"
+      },
+      {
+        "listen": "127.0.0.1:5201",
+        "remote": "127.0.0.1:5201",
+        "protocol": "udp",
+        "timeout": 30
+      },
+      {
+        "listen": "127.0.0.1:5201",
+        "remote": "127.0.0.1:5201",
+        "protocol": "tcp"
+      }
+    ]
+  }
+}
+```
+
+以下是client使用独立`url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+```json
+{
+  "client": {
+    "cdn-ip": "104.17.143.163",
+    "cdn-port": 80,
+    "scheme": "ws",
+    "global-url": "",
     "tunnels": [
       {
         "listen": "127.0.0.1:2408",

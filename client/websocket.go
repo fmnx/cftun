@@ -17,7 +17,16 @@ type Websocket struct {
 	headers  http.Header
 }
 
-func NewWebsocket(listenAddr, cfIp, url, scheme string, port int) *Websocket {
+func NewWebsocket(config *Config, idx int) *Websocket {
+	cfIp := config.CdnIp
+	port := config.CdnPort
+	scheme := config.Scheme
+	tunnelConf := config.Tunnels[idx]
+	url := tunnelConf.Url
+	listenAddr := tunnelConf.Listen
+	remote := tunnelConf.Remote
+	protocol := tunnelConf.Protocol
+
 	host := strings.Split(url, "/")[0]
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig: nil,
@@ -48,6 +57,10 @@ func NewWebsocket(listenAddr, cfIp, url, scheme string, port int) *Websocket {
 	headers := make(http.Header)
 	headers.Set("Host", host)
 	headers.Set("User-Agent", "DEV")
+	if remote != "" {
+		headers.Set("Forward-Dest", remote)
+		headers.Set("Forward-Proto", protocol)
+	}
 
 	return &Websocket{
 		wsDialer: wsDialer,

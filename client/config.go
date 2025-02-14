@@ -2,16 +2,18 @@ package client
 
 type Tunnel struct {
 	Listen   string `yaml:"listen" json:"listen"`
+	Remote   string `yaml:"remote" json:"remote"`
 	Url      string `yaml:"url" json:"url"`
 	Protocol string `yaml:"protocol" json:"protocol"`
 	Timeout  int    `yaml:"timeout" json:"timeout"`
 }
 
 type Config struct {
-	CdnIp   string   `yaml:"cdn-ip" json:"cdn-ip"`
-	CdnPort int      `yaml:"cdn-port" json:"cdn-port"`
-	Scheme  string   `yaml:"scheme" json:"scheme"`
-	Tunnels []Tunnel `yaml:"tunnels" json:"tunnels"`
+	CdnIp     string   `yaml:"cdn-ip" json:"cdn-ip"`
+	CdnPort   int      `yaml:"cdn-port" json:"cdn-port"`
+	GlobalUrl string   `yaml:"global-url" json:"global-url"`
+	Scheme    string   `yaml:"scheme" json:"scheme"`
+	Tunnels   []Tunnel `yaml:"tunnels" json:"tunnels"`
 }
 
 func (client *Config) Run() {
@@ -31,14 +33,17 @@ func (client *Config) Run() {
 		}
 	}
 
-	for _, tunnel := range client.Tunnels {
+	for idx, tunnel := range client.Tunnels {
+		if tunnel.Url == "" {
+			tunnel.Url = client.GlobalUrl
+		}
 		switch tunnel.Protocol {
 		case "udp":
-			go UdpListen(tunnel.Listen, client.CdnIp, tunnel.Url, client.Scheme, client.CdnPort, tunnel.Timeout)
+			go UdpListen(client, idx)
 		case "tcp":
-			go TcpListen(tunnel.Listen, client.CdnIp, tunnel.Url, client.Scheme, client.CdnPort)
+			go TcpListen(client, idx)
 		default:
-			go TcpListen(tunnel.Listen, client.CdnIp, tunnel.Url, client.Scheme, client.CdnPort)
+			go TcpListen(client, idx)
 		}
 	}
 }
