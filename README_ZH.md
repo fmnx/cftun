@@ -1,5 +1,7 @@
 # Cloudflare Tunnel 代理服务
 
+[English](README_EN.md)
+
 [![GitHub License](https://img.shields.io/badge/license-Apache%202.0-blue.svg
 )](https://opensource.org/licenses/Apache-2.0)
 [![Cloudflare兼容版本](https://img.shields.io/badge/cloudflared-v2025.2.0-green
@@ -87,7 +89,7 @@ go build
 
 ## 示例配置文件
 
-以下是server示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是server示例配置文件，您可以直接复制并根据实际需求进行修改：
 ```json
 {
   "server": {
@@ -104,7 +106,7 @@ go build
 }
 ```
 
-以下是client使用`global-url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是client使用`global-url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
 ```json
 {
   "client": {
@@ -140,7 +142,7 @@ go build
 }
 ```
 
-以下是client使用独立`url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是client使用独立`url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
 ```json
 {
   "client": {
