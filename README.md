@@ -9,8 +9,6 @@
 
 ## 📦 前置要求
 - 如果需要自行编译，必须使用[Cloudflare Golang环境](https://github.com/cloudflare/go)
-- 此处默认您已知悉如何在cloudflare web控制台配置tunnel
-- 由于控制台目前不支持设置UDP，控制台请选择RDP代替
 
 ## 🛠️ 安装步骤
 
