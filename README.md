@@ -1,9 +1,9 @@
 # Cloudflare Tunnel Proxy Service
 
-[中文文档](README_ZH.md)
-
 [![GitHub License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Cloudflare Compatible Version](https://img.shields.io/badge/cloudflared-v2025.2.0-green)](https://github.com/cloudflare/cloudflared)
+
+[中文文档](README_ZH.md)
 
 Securely expose internal network services through Cloudflare Tunnel with support for TCP/UDP hybrid protocol forwarding. Custom client based on [modified cloudflared](https://github.com/fmnx/cloudflared).
 
@@ -85,8 +85,6 @@ The JSON configuration file contains two main sections:
 ---
 
 ## Example Configurations
-
-## 示例配置文件
 
 ### Server configuration example:
 ```json
