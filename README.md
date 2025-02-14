@@ -56,7 +56,7 @@ go build
   优选 Cloudflare Anycast IP，如果不设置则解析url中的域名。
 
 - **cdn-port** (可选)  
-  CDN 的端口设置。对于 WebSocket，ws标准端口为 `80`，wss标准端口为 `443`，支持使用优质线路中转至非标准端口。
+  CDN 的端口设置。对于 WebSocket，ws标准端口为 `80`，wss标准端口为 `443`。
 
 - **scheme** (可选)  
   协议方案，支持 `ws` 或 `wss`，使用非标准端口时需根据实际情况设置。
