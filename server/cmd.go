@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/cloudflare/cloudflared/edgediscovery"
 	"github.com/cloudflare/cloudflared/ingress"
 	"github.com/cloudflare/cloudflared/logger"
@@ -42,10 +43,18 @@ func StartServer(
 	connectedSignal := signal.New(make(chan struct{}))
 	observer := connection.NewObserver(log, nil)
 
+	// Disable ICMP packet routing for quick tunnels
+	if namedTunnel.QuickTunnelUrl != "" {
+		_ = c.Set("url", "tcp://172.0.0.1:0")
+	}
 	tunnelConfig, orchestratorConfig, err := prepareTunnelConfig(ctx, c, buildInfo, log, observer, namedTunnel)
 	if err != nil {
 		log.Err(err).Msg("Couldn't start tunnel")
 		return err
+	}
+
+	if namedTunnel.QuickTunnelUrl != "" {
+		tunnelConfig.ICMPRouterServer = nil
 	}
 
 	serviceIP := c.String("service-op-ip")
@@ -74,7 +83,6 @@ func StartServer(
 		logger.ManagementLogger,
 	)
 	internalRules := []ingress.Rule{ingress.NewManagementRule(mgmt)}
-
 	orchestrator, err := orchestration.NewOrchestrator(ctx, orchestratorConfig, tunnelConfig.Tags, internalRules, tunnelConfig.Log)
 	if err != nil {
 		return err
@@ -166,4 +174,20 @@ func ParseToken(tokenStr string) (*connection.TunnelToken, error) {
 		return nil, err
 	}
 	return &token, nil
+}
+
+func GenerateToken(token *connection.TunnelToken) (string, error) {
+	if token == nil {
+		return "", fmt.Errorf("token cannot be nil")
+	}
+
+	// 将结构体序列化为 JSON
+	content, err := json.Marshal(token)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal token: %w", err)
+	}
+
+	// 将 JSON 编码为 Base64
+	tokenStr := base64.StdEncoding.EncodeToString(content)
+	return tokenStr, nil
 }

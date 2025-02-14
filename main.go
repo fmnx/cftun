@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 type RawConfig struct {
@@ -42,29 +43,30 @@ func parseConfig(configFile string) (*RawConfig, error) {
 var (
 	configFile         string
 	token              string
+	isQuick            bool
 	Version            = "unknown"
 	BuildDate          = "unknown"
 	BuildType          = "DEV"
 	CloudflaredVersion = "2025.2.0"
 	showVersion        bool
-	githubURL          = "https://github.com/fmnx/cftun" // GitHub 地址
+	quickData          = &server.QuickData{}
+	githubURL          = "https://github.com/fmnx/cftun"
 )
 
 func init() {
-	// 设置 configFile 标志，并指定默认值及说明
 	flag.StringVar(&configFile, "C", "./config.json", "")
 	flag.StringVar(&token, "T", "", "")
+	flag.BoolVar(&isQuick, "Q", false, "")
 	flag.BoolVar(&showVersion, "V", false, "")
 
-	// 自定义 Usage，显示 version、configFile 和 GitHub 地址
 	flag.Usage = func() {
 		fmt.Println("Usage:")
 		fmt.Printf("  -C\tSpecify the path to the config file.(default: \"./config.json\")\n")
 		fmt.Printf("  -T\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
+		fmt.Printf("  -Q\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
 		fmt.Printf("  -V\tDisplay the current binary file version.\n")
 		fmt.Println("\nFor more information, visit:", githubURL)
 	}
-	// 解析命令行参数
 	flag.Parse()
 }
 
@@ -74,14 +76,15 @@ func main() {
 		printVersion(bInfo)
 		return
 	}
-	if token != "" {
-		svr := &server.Config{
-			EdgeIPs:     nil,
-			Token:       token,
-			HaConn:      4,
-			BindAddress: "",
+	if token != "" || isQuick { // command line.
+		if isQuick {
+			token = "quick"
 		}
-		svr.Run(bInfo)
+		srv := &server.Config{
+			Token:  token,
+			HaConn: 4,
+		}
+		go srv.Run(bInfo, quickData)
 	} else {
 		rawConfig, err := parseConfig(configFile)
 		if err != nil {
@@ -92,14 +95,28 @@ func main() {
 			rawConfig.Client.Run()
 		}
 
+		time.Sleep(100 * time.Millisecond)
+
 		if rawConfig.Server != nil {
-			rawConfig.Server.Run(bInfo)
+			if rawConfig.Server.Token == "quick" {
+				isQuick = true
+			}
+			go rawConfig.Server.Run(bInfo, quickData)
 		}
+
 	}
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
-	<-sigCh
+	for {
+		select {
+		case <-sigCh:
+			if isQuick {
+				quickData.Save()
+			}
+			return
+		}
+	}
 }
 
 func printVersion(buildInfo *cliutil.BuildInfo) {

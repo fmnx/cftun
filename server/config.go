@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
+	"github.com/fmnx/cftun/log"
 	"github.com/urfave/cli/v2"
 	"os"
 )
@@ -13,11 +14,22 @@ type Config struct {
 	BindAddress string   `yaml:"bind-address" json:"bind-address"`
 }
 
-func (server *Config) Run(info *cliutil.BuildInfo) {
+func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
 	buildInfo = info
 
 	if server.HaConn == 0 {
 		server.HaConn = 4
+	}
+
+	if server.Token == "quick" {
+		if err := quickData.Load(); err != nil {
+			quickData.Token, quickData.QuickURL, err = ApplyQuickURL(info)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+		}
+		server.Token = quickData.Token
+		log.Infoln("\033[36mTHE TEMPORARY DOMAIN YOU HAVE APPLIED FOR IS: \033[0m%s", quickData.QuickURL)
 	}
 
 	app := &cli.App{}
@@ -59,6 +71,12 @@ func (server *Config) Run(info *cliutil.BuildInfo) {
 				}, &cli.BoolFlag{
 					Name:  "management-diagnostics",
 					Value: true,
+				}, &cli.StringFlag{
+					Name:  "quickURL",
+					Value: quickData.QuickURL,
+				}, &cli.StringFlag{
+					Name:  "url",
+					Value: "",
 				},
 			},
 		},

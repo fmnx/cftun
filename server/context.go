@@ -21,10 +21,14 @@ func newCommandContext(c *cli.Context) (*subcommandContext, error) {
 
 func (sc *subcommandContext) runWithCredentials(credentials connection.Credentials) error {
 	sc.log.Info().Str("tunnelID", credentials.TunnelID.String()).Msg("Starting tunnel")
-
+	namedTunnel := &connection.TunnelProperties{Credentials: credentials}
+	quickURL := sc.c.String("quickURL")
+	if quickURL != "" {
+		namedTunnel.QuickTunnelUrl = quickURL
+	}
 	return StartServer(
 		sc.c,
-		&connection.TunnelProperties{Credentials: credentials},
+		namedTunnel,
 		sc.log,
 	)
 }

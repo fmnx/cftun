@@ -39,7 +39,6 @@ func prepareTunnelConfig(
 	tags := []pogs.Tag{{Name: "ID", Value: clientID.String()}}
 
 	transportProtocol := "quic"
-
 	featureSelector, err := features.NewFeatureSelector(ctx, namedTunnel.Credentials.AccountTag, []string{}, false, log)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "Failed to create feature selector")
@@ -61,10 +60,10 @@ func prepareTunnelConfig(
 		Arch:     info.OSArch(),
 	}
 	cfg := config.GetConfiguration()
-	//ingressRules, err := ingress.ParseIngressFromConfigAndCLI(cfg, c, log)
-	//if err != nil {
-	//	return nil, nil, err
-	//}
+	ingressRules, err := ingress.ParseIngressFromConfigAndCLI(cfg, c, log)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	protocolSelector, err := connection.NewProtocolSelector(transportProtocol, namedTunnel.Credentials.AccountTag, c.IsSet("token"), c.Bool("post-quantum"), edgediscovery.ProtocolPercentage, connection.ResolveTTL, log)
 	if err != nil {
@@ -133,9 +132,9 @@ func prepareTunnelConfig(
 	}
 
 	orchestratorConfig := &orchestration.Config{
-		Ingress:            &ingress.Ingress{},
+		Ingress:            &ingressRules,
 		WarpRouting:        ingress.NewWarpRoutingConfig(&cfg.WarpRouting),
-		ConfigurationFlags: map[string]string{},
+		ConfigurationFlags: nil,
 		WriteTimeout:       0 * time.Second,
 	}
 	return tunnelConfig, orchestratorConfig, nil
