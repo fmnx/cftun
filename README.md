@@ -62,8 +62,8 @@ go build
 - **scheme** (可选)  
   协议方案，支持 `ws` 或 `wss`，使用非标准端口时需根据实际情况设置。
 
-- **global-url** (可选)
-  Tunnel控制台配置路径，如果存在 path，请一并填写
+- **global-url** (可选)  
+  Tunnel控制台配置路径，如果存在 path，请一并填写。
 
 - **tunnels** (可选)  
   隧道配置列表，每个隧道包含以下配置：
