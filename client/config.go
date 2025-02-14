@@ -34,9 +34,6 @@ func (client *Config) Run() {
 	}
 
 	for idx, tunnel := range client.Tunnels {
-		if tunnel.Url == "" {
-			tunnel.Url = client.GlobalUrl
-		}
 		switch tunnel.Protocol {
 		case "udp":
 			go UdpListen(client, idx)

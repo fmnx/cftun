@@ -21,11 +21,15 @@ func NewWebsocket(config *Config, idx int) *Websocket {
 	cfIp := config.CdnIp
 	port := config.CdnPort
 	scheme := config.Scheme
+
 	tunnelConf := config.Tunnels[idx]
-	url := tunnelConf.Url
 	listenAddr := tunnelConf.Listen
 	remote := tunnelConf.Remote
 	protocol := tunnelConf.Protocol
+	url := tunnelConf.Url
+	if url == "" {
+		url = config.GlobalUrl
+	}
 
 	host := strings.Split(url, "/")[0]
 	wsDialer := &websocket.Dialer{
