@@ -9,11 +9,11 @@ type Tunnel struct {
 }
 
 type Config struct {
-	CdnIp     string   `yaml:"cdn-ip" json:"cdn-ip"`
-	CdnPort   int      `yaml:"cdn-port" json:"cdn-port"`
-	GlobalUrl string   `yaml:"global-url" json:"global-url"`
-	Scheme    string   `yaml:"scheme" json:"scheme"`
-	Tunnels   []Tunnel `yaml:"tunnels" json:"tunnels"`
+	CdnIp     string    `yaml:"cdn-ip" json:"cdn-ip"`
+	CdnPort   int       `yaml:"cdn-port" json:"cdn-port"`
+	GlobalUrl string    `yaml:"global-url" json:"global-url"`
+	Scheme    string    `yaml:"scheme" json:"scheme"`
+	Tunnels   []*Tunnel `yaml:"tunnels" json:"tunnels"`
 }
 
 func (client *Config) Run() {
@@ -33,14 +33,14 @@ func (client *Config) Run() {
 		}
 	}
 
-	for idx, tunnel := range client.Tunnels {
+	for _, tunnel := range client.Tunnels {
 		switch tunnel.Protocol {
 		case "udp":
-			go UdpListen(client, idx)
+			go UdpListen(client, tunnel)
 		case "tcp":
-			go TcpListen(client, idx)
+			go TcpListen(client, tunnel)
 		default:
-			go TcpListen(client, idx)
+			go TcpListen(client, tunnel)
 		}
 	}
 }

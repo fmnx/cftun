@@ -90,20 +90,19 @@ func (t *TcpConnector) handleDownstream() {
 	}
 }
 
-func TcpListen(config *Config, idx int) {
-	listenAddr := config.Tunnels[idx].Listen
+func TcpListen(config *Config, tunnel *Tunnel) {
 	// 监听指定网卡源地址
-	tcpListener, err := net.Listen("tcp", listenAddr)
+	tcpListener, err := net.Listen("tcp", tunnel.Listen)
 	if err != nil {
 		log.Errorln("TCP listen error: %s", err.Error())
 		return
 	}
 	defer tcpListener.Close()
-	log.Infoln("TCP listen on %s", listenAddr)
+	log.Infoln("TCP listen on %s", tunnel.Listen)
 
 	errChan := make(chan error)
 
-	ws := NewWebsocket(config, idx)
+	ws := NewWebsocket(config, tunnel)
 
 	for {
 		conn, err := tcpListener.Accept()

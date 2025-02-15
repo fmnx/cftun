@@ -17,16 +17,12 @@ type Websocket struct {
 	headers  http.Header
 }
 
-func NewWebsocket(config *Config, idx int) *Websocket {
+func NewWebsocket(config *Config, tunnel *Tunnel) *Websocket {
 	cfIp := config.CdnIp
 	port := config.CdnPort
 	scheme := config.Scheme
 
-	tunnelConf := config.Tunnels[idx]
-	listenAddr := tunnelConf.Listen
-	remote := tunnelConf.Remote
-	protocol := tunnelConf.Protocol
-	url := tunnelConf.Url
+	url := tunnel.Url
 	if url == "" {
 		url = config.GlobalUrl
 	}
@@ -38,8 +34,8 @@ func NewWebsocket(config *Config, idx int) *Websocket {
 	}
 	dial := net.Dial
 	// 绑定监听地址对应的网卡出口
-	if !strings.Contains(listenAddr, "0.0.0.0") && !strings.Contains(listenAddr, "127.0.0.1") {
-		localIP, _, _ := net.SplitHostPort(listenAddr)
+	if !strings.Contains(tunnel.Listen, "0.0.0.0") && !strings.Contains(tunnel.Listen, "127.0.0.1") {
+		localIP, _, _ := net.SplitHostPort(tunnel.Listen)
 		localAddr := &net.TCPAddr{
 			IP:   net.ParseIP(localIP),
 			Port: 0,
@@ -61,9 +57,9 @@ func NewWebsocket(config *Config, idx int) *Websocket {
 	headers := make(http.Header)
 	headers.Set("Host", host)
 	headers.Set("User-Agent", "DEV")
-	if remote != "" {
-		headers.Set("Forward-Dest", remote)
-		headers.Set("Forward-Proto", protocol)
+	if tunnel.Remote != "" {
+		headers.Set("Forward-Dest", tunnel.Remote)
+		headers.Set("Forward-Proto", tunnel.Protocol)
 	}
 
 	return &Websocket{

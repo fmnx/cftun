@@ -55,20 +55,18 @@ func init() {
 }
 
 // UdpListen on addr.
-func UdpListen(config *Config, idx int) {
-	timeout := config.Tunnels[idx].Timeout
-	listenAddr := config.Tunnels[idx].Listen
+func UdpListen(config *Config, tunnel *Tunnel) {
 	// 监听指定网卡源地址
-	listener, err := net.ListenPacket("udp", listenAddr)
+	listener, err := net.ListenPacket("udp", tunnel.Listen)
 	if err != nil {
 		log.Errorln("UDP listen error: %v", err)
 		return
 	}
 	defer listener.Close()
 
-	log.Infoln("UDP listen on %s", listenAddr)
+	log.Infoln("UDP listen on %s", tunnel.Listen)
 
-	ws := NewWebsocket(config, idx)
+	ws := NewWebsocket(config, tunnel)
 
 	udpConns := &sync.Map{}
 
@@ -90,7 +88,7 @@ func UdpListen(config *Config, idx int) {
 		}
 
 		go func(n int, buf []byte, srcAddr net.Addr) {
-			conn := NewConn(ws, listener, srcAddr, timeout, udpConns)
+			conn := NewConn(ws, listener, srcAddr, tunnel.Timeout, udpConns)
 			if conn == nil {
 				udpBufPool.Put(buf)
 				return
