@@ -18,16 +18,7 @@ type Websocket struct {
 }
 
 func NewWebsocket(config *Config, tunnel *Tunnel) *Websocket {
-	cfIp := config.CdnIp
-	port := config.CdnPort
-	scheme := config.Scheme
-
-	url := tunnel.Url
-	if url == "" {
-		url = config.GlobalUrl
-	}
-
-	host := strings.Split(url, "/")[0]
+	host := strings.Split(tunnel.Url, "/")[0]
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig: nil,
 		Proxy:           http.ProxyFromEnvironment,
@@ -48,8 +39,8 @@ func NewWebsocket(config *Config, tunnel *Tunnel) *Websocket {
 
 	wsDialer.NetDial = func(network, addr string) (net.Conn, error) {
 		// 连接指定的 IP 地址而不是解析域名
-		if cfIp != "" {
-			return dial(network, fmt.Sprintf("%s:%d", cfIp, port))
+		if config.CdnIp != "" {
+			return dial(network, config.getAddress())
 		}
 		return dial(network, addr)
 	}
@@ -65,7 +56,7 @@ func NewWebsocket(config *Config, tunnel *Tunnel) *Websocket {
 	return &Websocket{
 		wsDialer: wsDialer,
 		headers:  headers,
-		url:      fmt.Sprintf("%s://%s", scheme, url),
+		url:      fmt.Sprintf("%s://%s", config.getScheme(), tunnel.Url),
 	}
 
 }

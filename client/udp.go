@@ -182,6 +182,7 @@ func (c *Connector) handleRemote() {
 			c.closed = true
 			c.udpConns.Delete(c.srcAddr.String())
 			_ = c.remoteConn.Close()
+			udpBufPool.Put(buf)
 			return
 		}
 

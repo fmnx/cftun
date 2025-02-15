@@ -1,5 +1,7 @@
 package client
 
+import "fmt"
+
 type Tunnel struct {
 	Listen   string `yaml:"listen" json:"listen"`
 	Remote   string `yaml:"remote" json:"remote"`
@@ -16,31 +18,49 @@ type Config struct {
 	Tunnels   []*Tunnel `yaml:"tunnels" json:"tunnels"`
 }
 
-func (client *Config) Run() {
-	if len(client.Tunnels) == 0 {
+func (c *Config) Run() {
+	if len(c.Tunnels) == 0 {
 		return
 	}
 
-	if client.CdnPort == 0 {
-		client.CdnPort = 443
-	}
-
-	if client.Scheme == "" {
-		if client.CdnPort == 80 {
-			client.Scheme = "ws"
-		} else {
-			client.Scheme = "wss"
+	for _, tunnel := range c.Tunnels {
+		if tunnel.Url == "" {
+			tunnel.Url = c.GlobalUrl
 		}
-	}
-
-	for _, tunnel := range client.Tunnels {
 		switch tunnel.Protocol {
 		case "udp":
-			go UdpListen(client, tunnel)
+			go UdpListen(c, tunnel)
 		case "tcp":
-			go TcpListen(client, tunnel)
+			go TcpListen(c, tunnel)
 		default:
-			go TcpListen(client, tunnel)
+			tunnel.Protocol = "tcp"
+			go TcpListen(c, tunnel)
 		}
+	}
+}
+
+func (c *Config) getAddress() string {
+	if c.CdnIp == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s:%d", c.CdnIp, c.getPort())
+}
+
+func (c *Config) getPort() int {
+	if c.CdnPort == 0 {
+		return 443
+	}
+	return c.CdnPort
+}
+
+func (c *Config) getScheme() string {
+	if c.Scheme != "" {
+		return c.Scheme
+	}
+	switch c.getPort() {
+	case 80:
+		return "ws"
+	default:
+		return "wss"
 	}
 }
