@@ -13,46 +13,47 @@ jobs:
       packages: write
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # 先检出用户代码，避免后续步骤覆盖
+
       - name: Cache Cloudflare Go
         id: cache-go
         uses: actions/cache@v4
         with:
           path: |
-            ${{ github.workspace }}/go
+            ${{ github.workspace }}/cf-go
           key: ${{ runner.os }}-cf-go-1.22.5
           restore-keys: |
             ${{ runner.os }}-cf-go
 
-      - name: Set up Go
+      - name: Set up Bootstrap Go
         if: steps.cache-go.outputs.cache-hit != 'true'
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23
-          
+          go-version: 1.23  # 使用官方Go作为引导编译器
+
       - name: Build and Install Cloudflare Go
         if: steps.cache-go.outputs.cache-hit != 'true'
         run: |
-          git clone https://github.com/cloudflare/go
-          cd go/src
+          git clone https://github.com/cloudflare/go "$GITHUB_WORKSPACE/cf-go"
+          cd "$GITHUB_WORKSPACE/cf-go/src"
           ./make.bash
 
-      - name: Add to PATH
+      - name: Set Custom Go Environment
         run: |
-          echo "$GITHUB_WORKSPACE/go/bin" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/cf-go/bin" >> $GITHUB_PATH
+          echo "GOROOT=$GITHUB_WORKSPACE/cf-go" >> $GITHUB_ENV
           echo "GOPATH=$GITHUB_WORKSPACE/gopath" >> $GITHUB_ENV
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
       - name: Cache deps
         id: cache-deps
         uses: actions/cache@v4
         with:
           path: |
             ${{ github.workspace }}/gopath/pkg/mod
-          key: ${{ runner.os }}-deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('go.mod') }}
           restore-keys: |
-            ${{ runner.os }}-deps
+            ${{ runner.os }}-deps-
 
       - name: Install deps
         if: steps.cache-deps.outputs.cache-hit != 'true'
