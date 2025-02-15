@@ -63,10 +63,10 @@ go build
   优选 Cloudflare Anycast IP，如果不设置则解析url中的域名。
 
 - **cdn-port** (可选)  
-  CDN 的端口设置。对于 WebSocket，ws标准端口为 `80`，wss标准端口为 `443`。
+  CDN 的端口设置。ws标准端口为 `80`，wss标准端口为 `443`，默认为443端口。
 
 - **scheme** (可选)  
-  协议方案，支持 `ws` 或 `wss`，使用非标准端口时需根据实际情况设置。
+  协议方案，支持 `ws` 或 `wss`，默认为wss，使用非标准端口时需根据实际情况设置。
 
 - **global-url** (可选)  
   Tunnel控制台配置路径，如果存在 path，请一并填写。
@@ -83,8 +83,8 @@ go build
     - **url** (可选)  
       优先使用该项配置(留空则使用`global-url`)。
 
-    - **protocol** (必选)  
-      指定本地监听端口使用的协议，支持 `tcp` 或 `udp`。
+    - **protocol** (可选)  
+      指定隧道使用的协议，支持 `tcp` 或 `udp`，默认为`tcp`。
 
     - **timeout** (可选)  
       UDP 连接的超时时间（单位：秒），默认为 60 秒，如需调整可单独配置。

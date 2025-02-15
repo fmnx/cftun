@@ -60,10 +60,10 @@ The JSON configuration file contains two main sections:
   Preferred Cloudflare Anycast IP. If empty, resolves the domain in the URL.
 
 - **cdn-port** (optional)  
-  CDN port settings. For WebSocket: standard ws port `80`, wss port `443`.
+  CDN port settings. standard ws port `80`, wss port `443`, default: 443.
 
 - **scheme** (optional)  
-  Protocol scheme: `ws` or `wss`. Required when using non-standard ports.
+  Protocol scheme: `ws` or `wss`. default: wss.(Required when using non-standard ports).
 
 - **global-url** (optional)  
   Tunnel dashboard configuration path. Include full path if applicable.
@@ -80,8 +80,8 @@ The JSON configuration file contains two main sections:
     - **url** (optional)  
       Priority configuration (uses global-url if empty).
 
-    - **protocol** (required)  
-      Local protocol: tcp or udp.
+    - **protocol** (optional)  
+      tunnel protocol: tcp or udp (default: tcp).
 
     - **timeout** (optional)  
       UDP connection timeout in seconds (default: 60).
