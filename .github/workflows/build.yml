@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Cache Cloudflare Go
+        id: cache-go
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/go
+          key: ${{ runner.os }}-cf-go-1.22.5
+          restore-keys: |
+            ${{ runner.os }}-cf-go
+
+      - name: Set up Go
+        if: steps.cache-go.outputs.cache-hit != 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+          
+      - name: Build and Install Cloudflare Go
+        if: steps.cache-go.outputs.cache-hit != 'true'
+        run: |
+          git clone https://github.com/cloudflare/go
+          cd go/src
+          ./make.bash
+
+      - name: Add to PATH
+        run: |
+          echo "$GITHUB_WORKSPACE/go/bin" >> $GITHUB_PATH
+          echo "GOPATH=$GITHUB_WORKSPACE/gopath" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Cache deps
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/gopath/pkg/mod
+          key: ${{ runner.os }}-deps
+          restore-keys: |
+            ${{ runner.os }}-deps
+
+      - name: Install deps
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: |
+          go mod download
+
+      - name: Build with build.sh
+        run: |
+          ./build.sh
+
+      - name: List build files
+        id: list-files
+        run: |
+          echo "files=$(ls build/ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+      - name: Upload build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build
+          retention-days: 1
