@@ -8,6 +8,7 @@ import (
 	"github.com/fmnx/cftun/client"
 	"github.com/fmnx/cftun/log"
 	"github.com/fmnx/cftun/server"
+	"github.com/spf13/pflag"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -54,20 +55,20 @@ var (
 )
 
 func init() {
-	flag.StringVar(&configFile, "C", "./config.json", "")
-	flag.StringVar(&token, "T", "", "")
-	flag.BoolVar(&isQuick, "Q", false, "")
-	flag.BoolVar(&showVersion, "V", false, "")
+	pflag.StringVarP(&configFile, "config", "c", "./config.json", "")
+	pflag.StringVarP(&token, "token", "t", "", "")
+	pflag.BoolVarP(&isQuick, "quick", "q", false, "")
+	pflag.BoolVarP(&showVersion, "version", "v", false, "")
 
 	flag.Usage = func() {
 		fmt.Println("Usage:")
-		fmt.Printf("  -C\tSpecify the path to the config file.(default: \"./config.json\")\n")
-		fmt.Printf("  -T\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
-		fmt.Printf("  -Q\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
-		fmt.Printf("  -V\tDisplay the current binary file version.\n")
+		fmt.Printf("  -c,--config\tSpecify the path to the config file.(default: \"./config.json\")\n")
+		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
+		fmt.Printf("  -q,--quick\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
+		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
 		fmt.Println("\nFor more information, visit:", githubURL)
 	}
-	flag.Parse()
+	pflag.Parse()
 }
 
 func main() {

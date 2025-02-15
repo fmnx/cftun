@@ -52,6 +52,7 @@ func (qd *QuickData) Load() error {
 	}
 
 	if time.Now().After(qd.LastActive.Add(10 * time.Minute)) {
+		log.Errorln("\033[31mThe temporary domain name previously applied for has expired and is being reapplied.\033[0m")
 		return errors.New("the loaded data has expired")
 	}
 
