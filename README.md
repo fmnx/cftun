@@ -7,9 +7,6 @@
 
 Securely expose internal network services through Cloudflare Tunnel with support for TCP/UDP hybrid protocol forwarding. Custom client based on [modified cloudflared](https://github.com/fmnx/cloudflared).
 
-## 📦 Prerequisites
-- Use [Cloudflare Golang environment](https://github.com/cloudflare/go) if compiling from source
-
 ## 🛠️ Installation Steps
 
 ### 1. Get the Program

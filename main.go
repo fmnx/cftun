@@ -68,7 +68,7 @@ func init() {
 		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
 		fmt.Println("\nFor more information, visit:", githubURL)
 	}
-	pflag.Parse()
+	flag.Parse()
 }
 
 func main() {

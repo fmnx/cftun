@@ -9,9 +9,6 @@
 
 通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[修改版cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
 
-## 📦 前置要求
-- 如果需要自行编译，必须使用[Cloudflare Golang环境](https://github.com/cloudflare/go)
-
 ## 🛠️ 安装步骤
 
 ### 1. 获取程序
