@@ -42,7 +42,14 @@ The JSON configuration file contains two main sections:
   Note: Temporary domains require using the client's `global-url` with `remote` specified in each tunnel configuration.
 
 - **edge-ips** (optional)  
-  Preferred server IP list from `198.41.192.0/20` range, using port `7844`
+  Preferred IP list for the server. The following ranges are supported, with port `7844`.
+  ```yaml
+  198.41.192.0/20
+  2606:4700:a0::/48
+  2606:4700:a1::/48
+  2606:4700:a8::/48
+  2606:4700:a9::/48
+  ```
 
 - **ha-conn** (optional)  
   Number of high-availability QUIC connections. Adjust according to network environment.
