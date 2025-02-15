@@ -10,68 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # 先检出用户代码，避免后续步骤覆盖
+        uses: actions/checkout@v4
 
-      - name: Cache Cloudflare Go
-        id: cache-go
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/cf-go
-          key: ${{ runner.os }}-cf-go-1.22.5
-          restore-keys: |
-            ${{ runner.os }}-cf-go
-
-      - name: Set up Bootstrap Go
-        if: steps.cache-go.outputs.cache-hit != 'true'
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23  # 使用官方Go作为引导编译器
+          go-version: "1.23"  # 使用官方稳定版
+          cache: true         # 启用自动模块缓存
 
-      - name: Build and Install Cloudflare Go
-        if: steps.cache-go.outputs.cache-hit != 'true'
+      - name: Verify Go
         run: |
-          git clone https://github.com/cloudflare/go "$GITHUB_WORKSPACE/cf-go"
-          cd "$GITHUB_WORKSPACE/cf-go/src"
-          ./make.bash
-
-      - name: Set Custom Go Environment
-        run: |
-          echo "$GITHUB_WORKSPACE/cf-go/bin" >> $GITHUB_PATH
-          echo "GOROOT=$GITHUB_WORKSPACE/cf-go" >> $GITHUB_ENV
-          echo "GOPATH=$GITHUB_WORKSPACE/gopath" >> $GITHUB_ENV
-
-      - name: Cache deps
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ github.workspace }}/gopath/pkg/mod
-          key: ${{ runner.os }}-deps-${{ hashFiles('go.mod') }}
-          restore-keys: |
-            ${{ runner.os }}-deps-
-
-      - name: Install deps
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          go mod download
+          go version
+          echo "GOROOT=$GOROOT"  # 确认环境变量
 
       - name: Build with build.sh
         run: |
+          chmod +x build.sh
           ./build.sh
 
-      - name: List build files
-        id: list-files
-        run: |
-          echo "files=$(ls build/ | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-
-      - name: Upload build files
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: build
-          retention-days: 1
+          name: build-binaries
+          path: build/
+          retention-days: 3
