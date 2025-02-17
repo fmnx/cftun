@@ -86,7 +86,7 @@ go build
     - **log-level** (可选)  
       tun设备日志级别，[debug|info|warn|error|silent], 默认为`info`。
 
-    - **route-rule** (可选)  
+    - **routes** (可选)  
       tun设备路由配置规则。
 
 - **tunnels** (可选)  
@@ -141,7 +141,7 @@ go build
       "name": "tun1",
       "interface": "eth0",
       "log-level": "error",
-      "route-rule": [
+      "routes": [
         "0.0.0.0/0",
         "::/1"
       ]

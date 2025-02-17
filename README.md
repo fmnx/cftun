@@ -83,8 +83,8 @@ The JSON configuration file contains two main sections:
     - **log-level** (optional)  
       Tun device log level: [debug|info|warn|error|silent]. Defaults to `info`.
 
-      - **route-rule** (optional)  
-        Routing configuration rules for TUN devices。
+    - **routes** (optional)  
+      Routing configuration rules for TUN devices。
 
 - **tunnels** (optional)  
   List of tunnel configurations:
@@ -139,7 +139,7 @@ The JSON configuration file contains two main sections:
       "name": "tun1",
       "interface": "eth0",
       "log-level": "error",
-      "route-rule": [
+      "routes": [
         "0.0.0.0/0",
         "::/1"
       ]
