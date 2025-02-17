@@ -122,6 +122,25 @@ The JSON configuration file contains two main sections:
 }
 ```
 
+
+### Client configuration using Tun：
+```json
+{
+  "client": {
+    "cdn-ip": "104.17.143.163",
+    "cdn-port": 80,
+    "scheme": "ws",
+    "global-url": "lade-io-lax-01.qzzz.io",
+    "tun": {
+      "enable": true,
+      "name": "tun1",
+      "interface": "eth0",
+      "log-level": "error"
+    }
+  }
+}
+```
+
 ### Client configuration using global-url:
 ```json
 {
