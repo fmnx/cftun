@@ -71,6 +71,21 @@ go build
 - **global-url** (可选)  
   Tunnel控制台配置路径，如果存在 path，请一并填写。
 
+- **tun** (可选)  
+  Tun设备配置(暂时只支持linux)。
+
+    - **enable** (可选)  
+      是否启用tun设备，默认为否。
+
+    - **name** (可选)  
+      tun设备名，默认为`cftun`。
+
+    - **interface** (可选)  
+      tun设备指定出口网卡，默认为系统主网卡。
+
+    - **log-level** (可选)  
+      tun设备日志级别，[debug|info|warn|error|silent], 默认为`info`。
+
 - **tunnels** (可选)  
   隧道配置列表，每个隧道包含以下配置：
 
@@ -93,7 +108,7 @@ go build
 
 ## 示例配置文件
 
-### 以下是server示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是server示例配置文件：
 ```json
 {
   "server": {
@@ -110,7 +125,25 @@ go build
 }
 ```
 
-### 以下是client使用`global-url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是client使用tun模式配置文件：
+```json
+{
+  "client": {
+    "cdn-ip": "104.17.143.163",
+    "cdn-port": 80,
+    "scheme": "ws",
+    "global-url": "lade-io-lax-01.qzzz.io",
+    "tun": {
+      "enable": true,
+      "name": "tun1",
+      "interface": "eth0",
+      "log-level": "error"
+    }
+  }
+}
+```
+
+### 以下是client使用`global-url`的示例配置文件：
 ```json
 {
   "client": {
@@ -146,7 +179,7 @@ go build
 }
 ```
 
-### 以下是client使用独立`url`的示例配置文件，您可以直接复制并根据实际需求进行修改：
+### 以下是client使用独立`url`的示例配置文件：
 ```json
 {
   "client": {

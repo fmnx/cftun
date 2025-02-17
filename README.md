@@ -68,6 +68,21 @@ The JSON configuration file contains two main sections:
 - **global-url** (optional)  
   Tunnel dashboard configuration path. Include full path if applicable.
 
+- **tun** (optional)  
+  Tun device configuration (currently only supports Linux).
+
+    - **enable** (optional)  
+      Enable the tun device. Default is false.
+
+    - **name** (optional)  
+      Tun device name. Defaults to `cftun`.
+
+    - **interface** (optional)  
+      Specifies the egress network interface for the tun device. Defaults to the system's primary network interface.
+
+    - **log-level** (optional)  
+      Tun device log level: [debug|info|warn|error|silent]. Defaults to `info`.
+
 - **tunnels** (optional)  
   List of tunnel configurations:
 

@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -51,7 +52,7 @@ var (
 	CloudflaredVersion = "2025.2.0"
 	showVersion        bool
 	quickData          = &server.QuickData{}
-	githubURL          = "https://github.com/fmnx/cftun"
+	tunName            string
 )
 
 func init() {
@@ -66,7 +67,6 @@ func init() {
 		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
 		fmt.Printf("  -q,--quick\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
 		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
-		fmt.Println("\nFor more information, visit:", githubURL)
 	}
 	pflag.Parse()
 }
@@ -93,6 +93,13 @@ func main() {
 		}
 
 		if rawConfig.Client != nil {
+			if rawConfig.Client.Tun != nil && rawConfig.Client.Tun.Enable && runtime.GOOS == "linux" {
+				tunName = rawConfig.Client.Tun.Name
+				if tunName == "" {
+					tunName = "cftun"
+					rawConfig.Client.Tun.Name = tunName
+				}
+			}
 			rawConfig.Client.Run()
 		}
 
@@ -114,6 +121,9 @@ func main() {
 		case <-sigCh:
 			if isQuick {
 				quickData.Save()
+			}
+			if tunName != "" {
+				client.DeleteTunDevice(tunName)
 			}
 			return
 		}
