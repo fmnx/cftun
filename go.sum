@@ -29,8 +29,8 @@ github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 h1:BHsljHzVlRcyQhjr
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
 github.com/fmnx/cloudflared v1.0.4 h1:3IygDTnQL4XRxDvH1V6hRDufWUmgsvWGUDSKJbF7o44=
 github.com/fmnx/cloudflared v1.0.4/go.mod h1:HMi8dImAr4jxe57B/0xDVSr6krJm2YCHNmxQ+wXc+Nw=
-github.com/fmnx/tun2socks/v2 v2.5.4 h1:S0QfBympIu2akaYMGOP7zofQ1Y1sl0O3I4x/IwvBUKc=
-github.com/fmnx/tun2socks/v2 v2.5.4/go.mod h1:9t5uwhqTsJoCQhyy04IjQnTYtVku9n4TeweFBL15JMg=
+github.com/fmnx/tun2socks/v2 v2.5.5 h1:yNj+wRWB5jvqbpUObHVuf+IUCbhu0tSefuGcAIoR/T8=
+github.com/fmnx/tun2socks/v2 v2.5.5/go.mod h1:9t5uwhqTsJoCQhyy04IjQnTYtVku9n4TeweFBL15JMg=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=

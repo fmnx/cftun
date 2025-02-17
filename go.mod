@@ -6,7 +6,7 @@ replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => 
 
 replace github.com/urfave/cli/v2 v2.3.0 => github.com/ipostelnik/cli/v2 v2.3.1-0.20210324024421-b6ea8234fe3d
 
-replace github.com/xjasonlyu/tun2socks/v2 v2.5.2 => github.com/fmnx/tun2socks/v2 v2.5.4
+replace github.com/xjasonlyu/tun2socks/v2 v2.5.2 => github.com/fmnx/tun2socks/v2 v2.5.5
 
 require (
 	github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe
