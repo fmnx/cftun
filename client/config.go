@@ -2,19 +2,11 @@ package client
 
 import (
 	"fmt"
-	"github.com/fmnx/cftun/log"
 	tunToArgo "github.com/xjasonlyu/tun2socks/v2/engine"
-	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 )
-
-type Tun struct {
-	Enable    bool   `yaml:"enable" json:"enable"`
-	Name      string `yaml:"name" json:"name"`
-	Interface string `yaml:"interface" json:"interface"`
-	LogLevel  string `yaml:"log-level" json:"log-level"`
-}
 
 type Tunnel struct {
 	Listen   string `yaml:"listen" json:"listen"`
@@ -33,29 +25,8 @@ type Config struct {
 	Tun       *Tun      `yaml:"tun" json:"tun"`
 }
 
-func (t *Tun) ConfigureTunDevice() {
-	if err := exec.Command("ip", "tuntap", "add", "mode", "tun", "dev", t.Name).Run(); err != nil {
-		log.Errorln("failed to add tun %s: %w", t.Name, err)
-	}
-
-	if err := exec.Command("ip", "addr", "add", "198.18.0.1/15", "dev", t.Name).Run(); err != nil {
-		log.Errorln("failed to add IPv4 address to %s: %w", t.Name, err)
-	}
-
-	if err := exec.Command("ip", "link", "set", t.Name, "up").Run(); err != nil {
-		log.Errorln("failed to set %s up: %w", t.Name, err)
-	}
-}
-
-func DeleteTunDevice(tunName string) {
-	tunToArgo.Stop()
-	_ = exec.Command("ip", "link", "set", tunName, "down").Run()
-	_ = exec.Command("ip", "tuntap", "del", tunName, "mode", "tun").Run()
-}
-
 func (c *Config) Run() {
-	if c.Tun != nil && c.Tun.Enable && runtime.GOOS == "linux" {
-		c.Tun.ConfigureTunDevice()
+	if c.Tun != nil && c.Tun.Enable {
 		address := fmt.Sprintf("%s:%d", c.CdnIp, c.CdnPort)
 		if strings.Contains(c.CdnIp, ":") && !strings.Contains(c.CdnIp, "[") {
 			address = fmt.Sprintf("[%s]:%d", c.CdnIp, c.CdnPort)
@@ -69,6 +40,21 @@ func (c *Config) Run() {
 		}
 		tunToArgo.Insert(key)
 		go tunToArgo.Start()
+
+		switch runtime.GOOS {
+		case "linux":
+			c.Tun.LinuxConfigure()
+		case "windows":
+			go func() {
+				time.Sleep(1 * time.Second)
+				c.Tun.WindowsConfigure()
+			}()
+		case "darwin":
+			go func() {
+				time.Sleep(1 * time.Second)
+				c.Tun.DarwinConfigure()
+			}()
+		}
 	}
 
 	if len(c.Tunnels) == 0 {

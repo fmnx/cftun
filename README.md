@@ -69,7 +69,7 @@ The JSON configuration file contains two main sections:
   Tunnel dashboard configuration path. Include full path if applicable.
 
 - **tun** (optional)  
-  Tun device configuration (currently only supports Linux).
+  Tun device configuration.
 
     - **enable** (optional)  
       Enable the tun device. Default is false.
@@ -82,6 +82,9 @@ The JSON configuration file contains two main sections:
 
     - **log-level** (optional)  
       Tun device log level: [debug|info|warn|error|silent]. Defaults to `info`.
+
+      - **route-rule** (optional)  
+        Routing configuration rules for TUN devices。
 
 - **tunnels** (optional)  
   List of tunnel configurations:
@@ -135,7 +138,11 @@ The JSON configuration file contains two main sections:
       "enable": true,
       "name": "tun1",
       "interface": "eth0",
-      "log-level": "error"
+      "log-level": "error",
+      "route-rule": [
+        "0.0.0.0/0",
+        "::/1"
+      ]
     }
   }
 }

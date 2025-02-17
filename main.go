@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"syscall"
 	"time"
 )
@@ -93,7 +92,7 @@ func main() {
 		}
 
 		if rawConfig.Client != nil {
-			if rawConfig.Client.Tun != nil && rawConfig.Client.Tun.Enable && runtime.GOOS == "linux" {
+			if rawConfig.Client.Tun != nil && rawConfig.Client.Tun.Enable {
 				tunName = rawConfig.Client.Tun.Name
 				if tunName == "" {
 					tunName = "cftun"

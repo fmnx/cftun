@@ -72,7 +72,7 @@ go build
   Tunnel控制台配置路径，如果存在 path，请一并填写。
 
 - **tun** (可选)  
-  Tun设备配置(暂时只支持linux)。
+  Tun设备配置。
 
     - **enable** (可选)  
       是否启用tun设备，默认为否。
@@ -85,6 +85,9 @@ go build
 
     - **log-level** (可选)  
       tun设备日志级别，[debug|info|warn|error|silent], 默认为`info`。
+
+    - **route-rule** (可选)  
+      tun设备路由配置规则。
 
 - **tunnels** (可选)  
   隧道配置列表，每个隧道包含以下配置：
@@ -137,7 +140,11 @@ go build
       "enable": true,
       "name": "tun1",
       "interface": "eth0",
-      "log-level": "error"
+      "log-level": "error",
+      "route-rule": [
+        "0.0.0.0/0",
+        "::/1"
+      ]
     }
   }
 }

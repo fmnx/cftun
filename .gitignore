@@ -3,4 +3,5 @@ cftun
 build
 config.json
 tun.json
+server.json
 .quick.json
