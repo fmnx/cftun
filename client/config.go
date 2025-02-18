@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	tunToArgo "github.com/xjasonlyu/tun2socks/v2/engine"
 	"strings"
 )
 
@@ -25,23 +24,7 @@ type Config struct {
 
 func (c *Config) Run() {
 	if c.Tun != nil && c.Tun.Enable {
-		address := fmt.Sprintf("%s:%d", c.CdnIp, c.CdnPort)
-		if strings.Contains(c.CdnIp, ":") && !strings.Contains(c.CdnIp, "[") {
-			address = fmt.Sprintf("[%s]:%d", c.CdnIp, c.CdnPort)
-		}
-		proxy := fmt.Sprintf("argo://%s:%s@%s", c.getScheme(), address, c.GlobalUrl)
-		key := &tunToArgo.Key{
-			MTU:       1280,
-			Proxy:     proxy,
-			Device:    c.Tun.Name,
-			LogLevel:  c.Tun.LogLevel,
-			Interface: c.Tun.Interface,
-		}
-		c.Tun.Run(key)
-	}
-
-	if len(c.Tunnels) == 0 {
-		return
+		c.Tun.Run(c.getScheme(), c.CdnIp, c.GlobalUrl, c.getPort())
 	}
 
 	for _, tunnel := range c.Tunnels {
@@ -79,7 +62,7 @@ func (c *Config) getScheme() string {
 		return c.Scheme
 	}
 	switch c.getPort() {
-	case 80:
+	case 80, 8080, 8880, 2052, 2082, 2086, 2095:
 		return "ws"
 	default:
 		return "wss"

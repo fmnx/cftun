@@ -2,8 +2,9 @@ package client
 
 import (
 	"fmt"
+	tunToArgo "github.com/fmnx/cftun/client/tun2argo/engine"
+	"github.com/fmnx/cftun/client/tun2argo/proxy"
 	"github.com/fmnx/cftun/log"
-	tunToArgo "github.com/xjasonlyu/tun2socks/v2/engine"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -18,10 +19,13 @@ type Tun struct {
 	Routes    []string `yaml:"routes" json:"routes"`
 }
 
-func (t *Tun) Run(key *tunToArgo.Key) {
+func (t *Tun) Run(scheme, cdnIP, url string, port int) {
 
-	tunToArgo.Insert(key)
-	go tunToArgo.Start()
+	argoProxy := proxy.NewArgo(scheme, cdnIP, url, port)
+	err := tunToArgo.HandleNetStack(argoProxy, t.Name, t.Interface, t.LogLevel, 1280)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 
 	switch runtime.GOOS {
 	case "linux":
@@ -41,7 +45,7 @@ func (t *Tun) Run(key *tunToArgo.Key) {
 
 func (t *Tun) LinuxConfigure() {
 	if err := exec.Command("ip", "tuntap", "add", "mode", "tun", "dev", t.Name).Run(); err != nil {
-		log.Errorln("failed to add tun %s: %w", t.Name, err)
+		log.Errorln("failed to add tun %s: %s", t.Name, err.Error())
 	}
 
 	if err := exec.Command("ip", "addr", "add", "198.18.0.1/15", "dev", t.Name).Run(); err != nil {

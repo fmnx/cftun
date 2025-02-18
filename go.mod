@@ -6,8 +6,6 @@ replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => 
 
 replace github.com/urfave/cli/v2 v2.3.0 => github.com/ipostelnik/cli/v2 v2.3.1-0.20210324024421-b6ea8234fe3d
 
-replace github.com/xjasonlyu/tun2socks/v2 v2.5.2 => github.com/fmnx/tun2socks/v2 v2.5.5
-
 require (
 	github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe
 	github.com/google/uuid v1.6.0
@@ -17,12 +15,10 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/xjasonlyu/tun2socks/v2 v2.5.2
 )
 
 require (
 	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
-	github.com/ajg/form v1.5.1 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -30,14 +26,11 @@ require (
 	github.com/coredns/coredns v1.11.3 // indirect
 	github.com/coreos/go-oidc/v3 v3.10.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/getsentry/sentry-go v0.16.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.0 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
-	github.com/go-chi/render v1.0.3 // indirect
-	github.com/go-gost/relay v0.5.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -49,7 +42,6 @@ require (
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/google/pprof v0.0.0-20230817174616-7a8ec2ada47b // indirect
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1 // indirect
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20180507213350-8e809c8a8645 // indirect
