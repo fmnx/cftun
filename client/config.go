@@ -3,9 +3,7 @@ package client
 import (
 	"fmt"
 	tunToArgo "github.com/xjasonlyu/tun2socks/v2/engine"
-	"runtime"
 	"strings"
-	"time"
 )
 
 type Tunnel struct {
@@ -33,28 +31,13 @@ func (c *Config) Run() {
 		}
 		proxy := fmt.Sprintf("argo://%s:%s@%s", c.getScheme(), address, c.GlobalUrl)
 		key := &tunToArgo.Key{
+			MTU:       1280,
 			Proxy:     proxy,
 			Device:    c.Tun.Name,
 			LogLevel:  c.Tun.LogLevel,
 			Interface: c.Tun.Interface,
 		}
-		tunToArgo.Insert(key)
-		go tunToArgo.Start()
-
-		switch runtime.GOOS {
-		case "linux":
-			c.Tun.LinuxConfigure()
-		case "windows":
-			go func() {
-				time.Sleep(1 * time.Second)
-				c.Tun.WindowsConfigure()
-			}()
-		case "darwin":
-			go func() {
-				time.Sleep(1 * time.Second)
-				c.Tun.DarwinConfigure()
-			}()
-		}
+		c.Tun.Run(key)
 	}
 
 	if len(c.Tunnels) == 0 {

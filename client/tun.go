@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type Tun struct {
@@ -15,6 +16,27 @@ type Tun struct {
 	Interface string   `yaml:"interface" json:"interface"`
 	LogLevel  string   `yaml:"log-level" json:"log-level"`
 	Routes    []string `yaml:"routes" json:"routes"`
+}
+
+func (t *Tun) Run(key *tunToArgo.Key) {
+
+	tunToArgo.Insert(key)
+	go tunToArgo.Start()
+
+	switch runtime.GOOS {
+	case "linux":
+		t.LinuxConfigure()
+	case "windows":
+		go func() {
+			time.Sleep(1 * time.Second)
+			t.WindowsConfigure()
+		}()
+	case "darwin":
+		go func() {
+			time.Sleep(1 * time.Second)
+			t.DarwinConfigure()
+		}()
+	}
 }
 
 func (t *Tun) LinuxConfigure() {
@@ -46,7 +68,7 @@ func (t *Tun) WindowsConfigure() {
 	}
 
 	// netsh interface ipv6 add address "tun0" fd12:3456:789a::1/64
-	if err := exec.Command("netsh", "interface", "ipv6", "add", "address", t.Name, "static", "fd12:3456:789a::1/64").Run(); err != nil {
+	if err := exec.Command("netsh", "interface", "ipv6", "add", "address", t.Name, "fd12:3456:789a::1/64").Run(); err != nil {
 		log.Errorln("failed to add ipv6 address for tun device %s: %w", t.Name, err)
 	}
 

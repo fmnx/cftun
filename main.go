@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
 	"github.com/fmnx/cftun/client"
@@ -60,7 +59,7 @@ func init() {
 	pflag.BoolVarP(&isQuick, "quick", "q", false, "")
 	pflag.BoolVarP(&showVersion, "version", "v", false, "")
 
-	flag.Usage = func() {
+	pflag.Usage = func() {
 		fmt.Println("Usage:")
 		fmt.Printf("  -c,--config\tSpecify the path to the config file.(default: \"./config.json\")\n")
 		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
