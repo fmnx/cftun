@@ -21,7 +21,8 @@ go build
 
 # Tunnel 服务配置说明
 
-本文档介绍了如何使用 JSON 配置文件来部署 Tunnel 隧道服务。 配置文件分为两大部分：服务端配置和客户端配置，用户可以根据自己的需求进行调整。
+本文档介绍了如何使用 JSON 配置文件来部署 Tunnel 隧道服务。
+配置文件分为两大部分：服务端配置和客户端配置，用户可以根据自己的需求进行调整。
 
 ---
 
@@ -145,7 +146,7 @@ go build
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",
-    "global-url": "lade-io-lax-01.qzzz.io",
+    "global-url": "argo.s01.dev",
     "tun": {
       "enable": true,
       "name": "tun1",
@@ -168,7 +169,7 @@ go build
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",
-    "global-url": "tunnel.qzzz.io",
+    "global-url": "argo.s01.dev",
     "tunnels": [
       {
         "listen": "127.0.0.1:2408",
@@ -209,24 +210,24 @@ go build
     "tunnels": [
       {
         "listen": "127.0.0.1:2408",
-        "url": "warp.qzzz.io",
+        "url": "warp.example.com",
         "protocol": "udp",
         "timeout": 30
       },
       {
         "listen": "127.0.0.1:2222",
-        "url": "ssh.qzzz.io",
+        "url": "ssh.example.com",
         "protocol": "tcp"
       },
       {
         "listen": "127.0.0.1:5201",
-        "url": "iperf3.qzzz.io/udp",
+        "url": "iperf3.example.com/udp",
         "protocol": "udp",
         "timeout": 30
       },
       {
         "listen": "127.0.0.1:5201",
-        "url": "iperf3.qzzz.io/tcp",
+        "url": "iperf3.example.com/tcp",
         "protocol": "tcp"
       }
     ]

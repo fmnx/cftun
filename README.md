@@ -20,8 +20,8 @@ go build
 
 # Tunnel Service Configuration
 
-This document describes how to deploy the Tunnel service using a JSON configuration file. The configuration file is
-divided into two main sections: server and client. Users can adjust these according to their requirements.
+This document describes how to deploy the Tunnel service using a JSON configuration file. 
+The configuration file is divided into two main sections: server and client. Users can adjust these according to their requirements.
 
 ---
 
@@ -146,7 +146,7 @@ The JSON configuration file contains two main sections:
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",
-    "global-url": "lade-io-lax-01.qzzz.io",
+    "global-url": "argo.s01.dev",
     "tun": {
       "enable": true,
       "name": "tun1",
@@ -169,7 +169,7 @@ The JSON configuration file contains two main sections:
     "cdn-ip": "104.17.143.163",
     "cdn-port": 80,
     "scheme": "ws",
-    "global-url": "tunnel.qzzz.io",
+    "global-url": "argo.s01.dev",
     "tunnels": [
       {
         "listen": "127.0.0.1:2408",
@@ -210,24 +210,24 @@ The JSON configuration file contains two main sections:
     "tunnels": [
       {
         "listen": "127.0.0.1:2408",
-        "url": "warp.qzzz.io",
+        "url": "warp.example.com",
         "protocol": "udp",
         "timeout": 30
       },
       {
         "listen": "127.0.0.1:2222",
-        "url": "ssh.qzzz.io",
+        "url": "ssh.example.com",
         "protocol": "tcp"
       },
       {
         "listen": "127.0.0.1:5201",
-        "url": "iperf3.qzzz.io/udp",
+        "url": "iperf3.example.com/udp",
         "protocol": "udp",
         "timeout": 30
       },
       {
         "listen": "127.0.0.1:5201",
-        "url": "iperf3.qzzz.io/tcp",
+        "url": "iperf3.example.com/tcp",
         "protocol": "tcp"
       }
     ]
