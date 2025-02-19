@@ -12,6 +12,7 @@
 ## 🛠️ 安装步骤
 
 ### 1. 获取程序
+
 ```bash
 git clone https://github.com/fmnx/cftun.git
 cd cftun
@@ -20,8 +21,7 @@ go build
 
 # Tunnel 服务配置说明
 
-本文档介绍了如何使用 JSON 配置文件来部署 Tunnel 隧道服务。
-配置文件分为两大部分：服务端配置和客户端配置，用户可以根据自己的需求进行调整。
+本文档介绍了如何使用 JSON 配置文件来部署 Tunnel 隧道服务。 配置文件分为两大部分：服务端配置和客户端配置，用户可以根据自己的需求进行调整。
 
 ---
 
@@ -56,7 +56,6 @@ go build
 - **bind-address** (可选)  
   指定服务端出口网卡的 IP 地址。如无特殊需求建议留空
 
-
 ### 2. 客户端配置 (`client`)
 
 - **cdn-ip** (可选)  
@@ -78,7 +77,16 @@ go build
       是否启用tun设备，默认为否。
 
     - **name** (可选)  
-      tun设备名，默认为`cftun`。
+      tun设备名，默认为`cftun0`。
+
+    - **ipv4** (可选)  
+      自定义tun设备ipv4地址。
+
+    - **ipv6** (可选)  
+      自定义tun设备ipv6地址。
+
+    - **mtu** (可选)  
+      自定义tun设备MTU大小。
 
     - **interface** (可选)  
       tun设备指定出口网卡，默认为系统主网卡。
@@ -112,6 +120,7 @@ go build
 ## 示例配置文件
 
 ### 以下是server示例配置文件：
+
 ```json
 {
   "server": {
@@ -129,6 +138,7 @@ go build
 ```
 
 ### 以下是client使用tun模式配置文件：
+
 ```json
 {
   "client": {
@@ -151,6 +161,7 @@ go build
 ```
 
 ### 以下是client使用`global-url`的示例配置文件：
+
 ```json
 {
   "client": {
@@ -187,6 +198,7 @@ go build
 ```
 
 ### 以下是client使用独立`url`的示例配置文件：
+
 ```json
 {
   "client": {

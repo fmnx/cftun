@@ -90,24 +90,26 @@ func main() {
 			log.Fatalln("Failed to parse config file: ", err.Error())
 		}
 
-		if rawConfig.Client != nil {
-			if rawConfig.Client.Tun != nil && rawConfig.Client.Tun.Enable {
-				tunName = rawConfig.Client.Tun.Name
+		c := rawConfig.Client
+		if c != nil {
+			if c.Tun != nil && c.Tun.Enable {
+				tunName = c.Tun.Name
 				if tunName == "" {
-					tunName = "cftun"
-					rawConfig.Client.Tun.Name = tunName
+					tunName = "cftun0"
+					c.Tun.Name = tunName
 				}
 			}
-			rawConfig.Client.Run()
+			c.Run()
 		}
 
 		time.Sleep(100 * time.Millisecond)
 
-		if rawConfig.Server != nil {
-			if rawConfig.Server.Token == "quick" {
+		s := rawConfig.Server
+		if s != nil {
+			if s.Token == "quick" {
 				isQuick = true
 			}
-			go rawConfig.Server.Run(bInfo, quickData)
+			go s.Run(bInfo, quickData)
 		}
 
 	}

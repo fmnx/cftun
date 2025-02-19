@@ -5,11 +5,13 @@
 
 [中文文档](README_ZH.md)
 
-Securely expose internal network services through Cloudflare Tunnel with support for TCP/UDP hybrid protocol forwarding. Custom client based on [modified cloudflared](https://github.com/fmnx/cloudflared).
+Securely expose internal network services through Cloudflare Tunnel with support for TCP/UDP hybrid protocol forwarding.
+Custom client based on [modified cloudflared](https://github.com/fmnx/cloudflared).
 
 ## 🛠️ Installation Steps
 
 ### 1. Get the Program
+
 ```bash
 git clone https://github.com/fmnx/cftun.git
 cd cftun
@@ -18,8 +20,8 @@ go build
 
 # Tunnel Service Configuration
 
-This document describes how to deploy the Tunnel service using a JSON configuration file. 
-The configuration file is divided into two main sections: server and client. Users can adjust these according to their requirements.
+This document describes how to deploy the Tunnel service using a JSON configuration file. The configuration file is
+divided into two main sections: server and client. Users can adjust these according to their requirements.
 
 ---
 
@@ -33,10 +35,11 @@ The JSON configuration file contains two main sections:
 ### 1. Server Configuration (`server`)
 
 - **token**  
-  Authentication token for the server. Use the token generated after creating a tunnel in the Cloudflare dashboard.
-  If you don't have a Cloudflare account, use `quick` to request a temporary domain via try.cloudflare.com.
-  The temporary domain remains valid while the server is running. If the server stays offline for over 10 minutes, the domain will expire and change upon restart.
-  Note: Temporary domains require using the client's `global-url` with `remote` specified in each tunnel configuration.
+  Authentication token for the server. Use the token generated after creating a tunnel in the Cloudflare dashboard. If
+  you don't have a Cloudflare account, use `quick` to request a temporary domain via try.cloudflare.com. The temporary
+  domain remains valid while the server is running. If the server stays offline for over 10 minutes, the domain will
+  expire and change upon restart. Note: Temporary domains require using the client's `global-url` with `remote`
+  specified in each tunnel configuration.
 
 - **edge-ips** (optional)  
   Preferred IP list for the server. The following ranges are supported, with port `7844`.
@@ -75,7 +78,16 @@ The JSON configuration file contains two main sections:
       Enable the tun device. Default is false.
 
     - **name** (optional)  
-      Tun device name. Defaults to `cftun`.
+      Tun device name. Defaults to `cftun0`.
+
+    - **ipv4** (optional)  
+      Custom TUN device IPv4 address.
+
+    - **ipv6** (optional)  
+      Custom TUN device IPv6 address.
+
+    - **mtu** (optional)  
+      Custom TUN device MTU size.
 
     - **interface** (optional)  
       Specifies the egress network interface for the tun device. Defaults to the system's primary network interface.
@@ -109,6 +121,7 @@ The JSON configuration file contains two main sections:
 ## Example Configurations
 
 ### Server configuration example:
+
 ```json
 {
   "server": {
@@ -125,8 +138,8 @@ The JSON configuration file contains two main sections:
 }
 ```
 
-
 ### Client configuration using Tun：
+
 ```json
 {
   "client": {
@@ -149,6 +162,7 @@ The JSON configuration file contains two main sections:
 ```
 
 ### Client configuration using global-url:
+
 ```json
 {
   "client": {
@@ -185,6 +199,7 @@ The JSON configuration file contains two main sections:
 ```
 
 ### Client configuration using individual url:
+
 ```json
 {
   "client": {
