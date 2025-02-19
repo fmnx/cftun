@@ -57,6 +57,30 @@ go build
 - **bind-address** (可选)  
   指定服务端出口网卡的 IP 地址。如无特殊需求建议留空
 
+- **warp** (可选)  
+  服务端出口添加warp双栈支持，基于wireguard。
+
+    - **endpoint** (必选)  
+      wireguard 终端。
+
+    - **ipv4** (必选)  
+      wireguard ipv4地址。
+
+    - **ipv6** (可选)  
+      wireguard ipv6地址。
+
+    - **private-key** (必选)  
+      wireguard 私钥.
+
+    - **public-key** (必选)  
+      wireguard 公钥.
+
+    - **proxy4** (可选)  
+      出口是否使用warp代理ipv4流量. [true|false]
+
+    - **proxy6** (可选)  
+      出口是否使用warp代理ipv6流量. [true|false]
+
 ### 2. 客户端配置 (`client`)
 
 - **cdn-ip** (可选)  
@@ -75,7 +99,7 @@ go build
   Tun设备配置。
 
     - **enable** (可选)  
-      是否启用tun设备，默认为否。
+      是否启用tun设备，默认为否。[true|false]
 
     - **name** (可选)  
       tun设备名，默认为`cftun0`。

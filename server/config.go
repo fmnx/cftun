@@ -12,6 +12,7 @@ type Config struct {
 	Token       string   `yaml:"token" json:"token"`
 	HaConn      int      `yaml:"ha-conn" json:"ha-conn"`
 	BindAddress string   `yaml:"bind-address" json:"bind-address"`
+	Warp        *Warp    `yaml:"warp" json:"warp"`
 }
 
 func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
@@ -30,6 +31,10 @@ func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
 		}
 		server.Token = quickData.Token
 		log.Infoln("\033[36mTHE TEMPORARY DOMAIN YOU HAVE APPLIED FOR IS: \033[0m%s", quickData.QuickURL)
+	}
+
+	if server.Warp != nil {
+		server.Warp.Run()
 	}
 
 	app := &cli.App{}

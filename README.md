@@ -57,6 +57,30 @@ The JSON configuration file contains two main sections:
 - **bind-address** (optional)  
   Specify the server's egress network interface IP. Leave empty if not required.
 
+- **warp** (optional)  
+  Add warp dual-stack support to the server egress, based on WireGuard.
+
+    - **endpoint** (required)  
+      WireGuard endpoint.
+
+    - **ipv4** (required)  
+      WireGuard IPv4 address.
+
+    - **ipv6** (optional)  
+      WireGuard IPv6 address.
+
+    - **private-key** (required)  
+      WireGuard private key.
+
+    - **public-key** (required)  
+      WireGuard public key.
+
+    - **proxy4** (optional)  
+      Whether to use warp to proxy IPv4 traffic at the egress. [true|false]
+
+    - **proxy6** (optional)  
+      Whether to use warp to proxy IPv6 traffic at the egress. [true|false]
+
 ### 2. Client Configuration (client)
 
 - **cdn-ip** (optional)  
@@ -75,7 +99,7 @@ The JSON configuration file contains two main sections:
   Tun device configuration.
 
     - **enable** (optional)  
-      Enable the tun device. Default is false.
+      Enable the tun device. Default is false. [true|false]
 
     - **name** (optional)  
       Tun device name. Defaults to `cftun0`.

@@ -2,13 +2,14 @@ module github.com/fmnx/cftun
 
 go 1.23.1
 
-replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => github.com/fmnx/cloudflared v1.0.4
+replace github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe => github.com/fmnx/cloudflared v1.0.5
 
 replace github.com/urfave/cli/v2 v2.3.0 => github.com/ipostelnik/cli/v2 v2.3.1-0.20210324024421-b6ea8234fe3d
 
+replace golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 => github.com/fmnx/wireguard-go v0.0.0-20250219190406-6776123cac23
+
 require (
 	github.com/cloudflare/cloudflared v0.0.0-20241220162412-2714d10d62fe
-	github.com/docker/go-units v0.4.0
 	github.com/gobwas/ws v1.4.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/schema v1.4.1
