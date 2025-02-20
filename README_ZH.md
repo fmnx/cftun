@@ -60,20 +60,23 @@ go build
 - **warp** (可选)  
   服务端出口添加warp双栈支持，基于wireguard。
 
-    - **endpoint** (必选)  
-      wireguard 终端。
+    - **auto** (可选)  
+      是否自动申请warp.默认值为`false` [true|false]
 
-    - **ipv4** (必选)  
-      wireguard ipv4地址。
+    - **endpoint** (可选)  
+      wireguard 终端。当`auto`为`false`时，此项必填。
+
+    - **ipv4** (可选)  
+      wireguard ipv4地址。当`auto`为`false`时，此项必填。
 
     - **ipv6** (可选)  
       wireguard ipv6地址。
 
-    - **private-key** (必选)  
-      wireguard 私钥.
+    - **private-key** (可选)  
+      wireguard 私钥。当`auto`为`false`时，此项必填。
 
-    - **public-key** (必选)  
-      wireguard 公钥.
+    - **public-key** (可选)  
+      wireguard 公钥。当`auto`为`false`时，此项必填。
 
     - **proxy4** (可选)  
       出口是否使用warp代理ipv4流量. [true|false]

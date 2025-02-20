@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	cfwebsocket "github.com/cloudflare/cloudflared/websocket"
+	"github.com/fmnx/cftun/client/tun2argo/transport/argo"
 	"github.com/fmnx/cftun/log"
 	"github.com/gorilla/websocket"
 	"net"
@@ -73,5 +73,5 @@ func (w *Websocket) createWebsocketStream() (net.Conn, error) {
 		return nil, err
 	}
 
-	return &cfwebsocket.GorillaConn{Conn: wsConn}, nil
+	return &argo.GorillaConn{Conn: wsConn}, nil
 }

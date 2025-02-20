@@ -58,22 +58,25 @@ The JSON configuration file contains two main sections:
   Specify the server's egress network interface IP. Leave empty if not required.
 
 - **warp** (optional)  
-  Add warp dual-stack support to the server egress, based on WireGuard.
+  Add dual-stack support for warp on server egress (based on WireGuard).
 
-    - **endpoint** (required)  
-      WireGuard endpoint.
+    - **auto** (optional)  
+      Whether to automatically apply for warp. Default: false [true|false]
 
-    - **ipv4** (required)  
-      WireGuard IPv4 address.
+    - **endpoint** (optional)  
+      WireGuard endpoint. Required when `auto` is `false`.
+
+    - **ipv4** (optional)  
+      WireGuard IPv4 address. Required when `auto` is `false`.
 
     - **ipv6** (optional)  
       WireGuard IPv6 address.
 
-    - **private-key** (required)  
-      WireGuard private key.
+    - **private-key** (optional)  
+      WireGuard private key. Required when `auto` is `false`.
 
-    - **public-key** (required)  
-      WireGuard public key.
+    - **public-key** (optional)  
+      WireGuard public key. Required when `auto` is `false`.
 
     - **proxy4** (optional)  
       Whether to use warp to proxy IPv4 traffic at the egress. [true|false]

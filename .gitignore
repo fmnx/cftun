@@ -5,3 +5,4 @@ config.json
 tun.json
 server.json
 .quick.json
+.warp.json

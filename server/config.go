@@ -33,7 +33,7 @@ func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
 		log.Infoln("\033[36mTHE TEMPORARY DOMAIN YOU HAVE APPLIED FOR IS: \033[0m%s", quickData.QuickURL)
 	}
 
-	if server.Warp != nil {
+	if server.Warp != nil && (server.Warp.Proxy4 || server.Warp.Proxy6) {
 		server.Warp.Run()
 	}
 
