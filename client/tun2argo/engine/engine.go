@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/fmnx/cftun/client/tun2argo/buffer"
 	"github.com/fmnx/cftun/client/tun2argo/dialer"
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 	"net"
@@ -46,6 +47,7 @@ func stop() (err error) {
 }
 
 func HandleNetStack(argoProxy *proxy.Argo, device, interfaceName, logLevel string, mtu int) (err error) {
+	buffer.RelayBufferSize = mtu
 	level, err := log.ParseLevel(logLevel)
 	if err != nil {
 		return err

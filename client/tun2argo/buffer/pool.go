@@ -13,8 +13,10 @@ const (
 	// io.Copy default buffer size is 32 KiB, but the maximum packet
 	// size of vmess/shadowsocks is about 16 KiB, so define a buffer
 	// of 20 KiB to reduce the memory of each TCP relay.
-	RelayBufferSize = 20 << 10
+	//RelayBufferSize = 20 << 10
 )
+
+var RelayBufferSize int
 
 var _allocator = allocator.New()
 
