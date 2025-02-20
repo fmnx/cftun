@@ -122,8 +122,6 @@ func (w *Warp) Run() {
 		log.Fatalln("The warp parameter is incorrect.")
 	}
 
-	log.Fatalln("%v", w.Proxy4)
-
 	if strings.Contains(w.IPv4, "/") {
 		w.IPv4 = strings.Split(w.IPv4, "/")[0]
 	}
