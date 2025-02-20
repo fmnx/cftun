@@ -38,9 +38,12 @@ func (w *Warp) load() {
 	if err != nil {
 		w.apply()
 		w.save()
-		return
+	} else {
+		proxy4, proxy6 := w.Proxy4, w.Proxy6
+		_ = json.Unmarshal(buf, w)
+		w.Proxy4, w.Proxy6 = proxy4, proxy6
 	}
-	_ = json.Unmarshal(buf, w)
+
 }
 
 func (w *Warp) save() {
@@ -118,6 +121,8 @@ func (w *Warp) Run() {
 	} else if !w.verify() {
 		log.Fatalln("The warp parameter is incorrect.")
 	}
+
+	log.Fatalln("%v", w.Proxy4)
 
 	if strings.Contains(w.IPv4, "/") {
 		w.IPv4 = strings.Split(w.IPv4, "/")[0]
