@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
+	"fmt"
 	"github.com/cloudflare/cloudflared/ingress"
 	"github.com/fmnx/cftun/log"
 	"github.com/tidwall/gjson"
@@ -11,6 +12,7 @@ import (
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 	"io"
+	"net"
 	"net/http"
 	"net/netip"
 	"os"
@@ -147,8 +149,27 @@ func (w *Warp) Run() {
 	dev := device.NewDevice(tunDev, bind, logger)
 	dev.SetPrivateKey(w.PrivateKey)
 	peer := dev.SetPublicKey(w.PublicKey)
-	dev.SetEndpoint(peer, w.Endpoint).SetAllowedIP(peer)
+
+	dev.SetEndpoint(peer, resolvEndpoint(w.Endpoint)).SetAllowedIP(peer)
 	peer.HandlePostConfig()
 
 	ingress.Warp.Set(tnet.DialContext, w.Proxy4, w.Proxy6)
+}
+
+func resolvEndpoint(endpoint string) string {
+	host, port, _ := net.SplitHostPort(endpoint)
+	c, err := net.DialTimeout("tcp6", "[2606:4700:4700::64]:443", 3*time.Second)
+	defer c.Close()
+	if err != nil { // ipv4-only
+		addr, err := net.ResolveIPAddr("ip4", host)
+		if err != nil {
+			log.Fatalln("Failed to resolve endpoint for warp.")
+		}
+		return fmt.Sprintf("%s:%s", addr.String(), port)
+	}
+	addr, err := net.ResolveIPAddr("ip6", host)
+	if err != nil {
+		log.Fatalln("Failed to resolve endpoint for warp.")
+	}
+	return fmt.Sprintf("[%s]:%s", addr.String(), port)
 }
