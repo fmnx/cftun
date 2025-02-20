@@ -38,6 +38,7 @@ func (w *Warp) load() {
 	if err != nil {
 		w.apply()
 		w.save()
+		return
 	}
 	_ = json.Unmarshal(buf, w)
 }
