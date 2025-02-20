@@ -3,7 +3,7 @@
 set -e  # 发生错误时退出
 
 APP_NAME="cftun"
-VERSION="2.0.8"
+VERSION="2.0.9"
 BUILD_TYPE="product"
 BUILD_DIR="build"
 PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
@@ -32,6 +32,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     else
         tar -czvf "$BUILD_DIR/$APP_NAME-$OS-$ARCH.tar.gz" -C "$BUILD_DIR" "$OUTPUT_NAME"
     fi
+    rm $OUTPUT_NAME
 done
 
 echo "Build completed! Files are in the '$BUILD_DIR' directory."
