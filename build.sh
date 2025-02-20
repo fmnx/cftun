@@ -32,7 +32,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
     else
         tar -czvf "$BUILD_DIR/$APP_NAME-$OS-$ARCH.tar.gz" -C "$BUILD_DIR" "$OUTPUT_NAME"
     fi
-    rm $OUTPUT_NAME
+    rm $BUILD_DIR/$OUTPUT_NAME
 done
 
 echo "Build completed! Files are in the '$BUILD_DIR' directory."
