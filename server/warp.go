@@ -159,7 +159,6 @@ func (w *Warp) Run() {
 func resolvEndpoint(endpoint string) string {
 	host, port, _ := net.SplitHostPort(endpoint)
 	c, err := net.DialTimeout("tcp6", "[2606:4700:4700::64]:443", 3*time.Second)
-	defer c.Close()
 	if err != nil { // ipv4-only
 		addr, err := net.ResolveIPAddr("ip4", host)
 		if err != nil {
@@ -171,5 +170,6 @@ func resolvEndpoint(endpoint string) string {
 	if err != nil {
 		log.Fatalln("Failed to resolve endpoint for warp.")
 	}
+	_ = c.Close()
 	return fmt.Sprintf("[%s]:%s", addr.String(), port)
 }
