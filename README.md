@@ -72,6 +72,9 @@ The JSON configuration file contains two main sections:
     - **ipv6** (optional)  
       WireGuard IPv6 address.
 
+    - **reserved** (optional)  
+      Set Warp's WireGuard reserved field.
+
     - **private-key** (optional)  
       WireGuard private key. Required when `auto` is `false`.
 

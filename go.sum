@@ -25,8 +25,8 @@ github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568 h1:BHsljHzVlRcyQhjr
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
 github.com/fmnx/cloudflared v1.0.5 h1:L1cw9f6MkloBFx1WczSLj8SQAkVkISmb7DM2qhpvr0M=
 github.com/fmnx/cloudflared v1.0.5/go.mod h1:8bGKNUvyeyNaDwpMwG55K3mdqqFO9LOwn05573IvNSw=
-github.com/fmnx/wireguard-go v0.0.0-20250219190406-6776123cac23 h1:czOZr1JZSXTqpp4s1SiUE+YYRL/fwhJdyKF/G5WtsB4=
-github.com/fmnx/wireguard-go v0.0.0-20250219190406-6776123cac23/go.mod h1:tkCQ4FQXmpAgYVh++1cq16/dH4QJtmvpRv19DWGAHSA=
+github.com/fmnx/wireguard-go v0.0.0-20250301112125-4725a87a101b h1:lA98dpHwds4ydITkj3Jw93RclUGDR2wuiR1gkcthlCg=
+github.com/fmnx/wireguard-go v0.0.0-20250301112125-4725a87a101b/go.mod h1:tkCQ4FQXmpAgYVh++1cq16/dH4QJtmvpRv19DWGAHSA=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=

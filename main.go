@@ -78,6 +78,8 @@ func main() {
 	if token != "" || isQuick { // command line.
 		if isQuick {
 			token = "quick"
+		} else if token == "quick" {
+			isQuick = true
 		}
 		srv := &server.Config{
 			Token:  token,

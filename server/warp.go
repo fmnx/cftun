@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/cloudflare/cloudflared/ingress"
@@ -27,6 +28,7 @@ type Warp struct {
 	IPv6       string `yaml:"ipv6" json:"ipv6"`
 	PrivateKey string `yaml:"private-key" json:"private-key"`
 	PublicKey  string `yaml:"public-key" json:"public-key"`
+	Reserved   []byte `yaml:"reserved" json:"reserved"`
 	Proxy4     bool   `yaml:"proxy4" json:"proxy4"`
 	Proxy6     bool   `yaml:"proxy6" json:"proxy6"`
 }
@@ -103,10 +105,13 @@ func (w *Warp) apply() {
 	}
 
 	body, _ := io.ReadAll(reader)
+	clientID := gjson.Get(string(body), "config.client_id").String()
 	ipv6 := gjson.Get(string(body), "config.interface.addresses.v6").String()
 	if ipv6 == "" {
 		log.Fatalln("Failed to automatically apply for Warp.")
 	}
+
+	w.Reserved, _ = base64.StdEncoding.DecodeString(clientID)
 	w.IPv4 = "172.16.0.2"
 	w.IPv6 = ipv6
 	w.PrivateKey = privateKey.String()
@@ -145,6 +150,9 @@ func (w *Warp) Run() {
 	}
 
 	bind := conn.NewStdNetBind()
+	if w.Reserved != nil {
+		bind.(*conn.StdNetBind).SetReserved(w.Reserved)
+	}
 	logger := device.NewLogger(1, "")
 	dev := device.NewDevice(tunDev, bind, logger)
 	dev.SetPrivateKey(w.PrivateKey)

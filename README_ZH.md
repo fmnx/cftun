@@ -72,6 +72,9 @@ go build
     - **ipv6** (可选)  
       wireguard ipv6地址。
 
+    - **reserved** (可选)  
+      设置warp的wireguard保留字段。
+
     - **private-key** (可选)  
       wireguard 私钥。当`auto`为`false`时，此项必填。
 
