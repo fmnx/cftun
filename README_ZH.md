@@ -7,7 +7,7 @@
 
 [English](README.md)
 
-通过Cloudflare Tunnel实现内网服务的安全暴露，支持TCP/UDP混合协议转发。基于[修改版cloudflared](https://github.com/fmnx/cloudflared)定制开发的客户端。
+通过Cloudflare Argo Tunnel实现两个私网的互联互通，支持TCP/UDP协议转发, 支持TUN设备。
 
 ## 🛠️ 安装步骤
 

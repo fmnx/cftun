@@ -5,8 +5,7 @@
 
 [中文文档](README_ZH.md)
 
-Securely expose internal network services through Cloudflare Tunnel with support for TCP/UDP hybrid protocol forwarding.
-Custom client based on [modified cloudflared](https://github.com/fmnx/cloudflared).
+Achieving interconnection between two private networks through Cloudflare Argo Tunnel, supporting TCP/UDP protocol forwarding and TUN devices.
 
 ## 🛠️ Installation Steps
 
