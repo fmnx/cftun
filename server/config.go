@@ -1,11 +1,36 @@
 package server
 
 import (
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
+	"fmt"
 	"github.com/fmnx/cftun/log"
-	"github.com/urfave/cli/v2"
-	"os"
+	"github.com/fmnx/cftun/server/cfd"
+	"github.com/google/uuid"
+	"net"
+	"net/netip"
+	"runtime"
 )
+
+type BuildInfo struct {
+	GoOS               string `json:"go_os"`
+	GoVersion          string `json:"go_version"`
+	GoArch             string `json:"go_arch"`
+	BuildType          string `json:"build_type"`
+	CloudflaredVersion string `json:"cloudflared_version"`
+}
+
+func GetBuildInfo(buildType, version string) *BuildInfo {
+	return &BuildInfo{
+		GoOS:               runtime.GOOS,
+		GoVersion:          runtime.Version(),
+		GoArch:             runtime.GOARCH,
+		BuildType:          buildType,
+		CloudflaredVersion: version,
+	}
+}
+
+func (bi *BuildInfo) UserAgent() string {
+	return fmt.Sprintf("cloudflared/%s", bi.CloudflaredVersion)
+}
 
 type Config struct {
 	EdgeIPs     []string `yaml:"edge-ips" json:"edge-ips"`
@@ -15,9 +40,7 @@ type Config struct {
 	Warp        *Warp    `yaml:"warp" json:"warp"`
 }
 
-func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
-	buildInfo = info
-
+func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 	if server.HaConn == 0 {
 		server.HaConn = 4
 	}
@@ -33,62 +56,40 @@ func (server *Config) Run(info *cliutil.BuildInfo, quickData *QuickData) {
 		log.Infoln("\033[36mTHE TEMPORARY DOMAIN YOU HAVE APPLIED FOR IS: \033[0m%s", quickData.QuickURL)
 	}
 
+	dialFunc := net.Dial
 	if server.Warp != nil && (server.Warp.Proxy4 || server.Warp.Proxy6) {
-		server.Warp.Run()
+		dialFunc = server.Warp.Run()
 	}
 
-	app := &cli.App{}
-	app.Flags = []cli.Flag{}
+	clientID, _ := uuid.NewRandom()
+	var edgeIPS chan netip.AddrPort
+	if len(server.EdgeIPs) > 0 {
+		edgeIPS = make(chan netip.AddrPort, len(server.EdgeIPs))
+		for _, addr := range server.EdgeIPs {
+			edgeAddr, err := netip.ParseAddrPort(addr)
+			if err == nil {
+				edgeIPS <- edgeAddr
+			}
+		}
+	}
 
-	hostname, _ := os.Hostname()
-	app.Commands = []*cli.Command{
-		{
-			Name:   "run",
-			Action: cliutil.ConfiguredAction(RunCommand),
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "token",
-					Value: server.Token,
-				},
-				&cli.StringSliceFlag{
-					Name:  "edge",
-					Value: cli.NewStringSlice(server.EdgeIPs...),
-				},
-				&cli.IntFlag{
-					Name:  "ha-conn",
-					Value: server.HaConn,
-				},
-				&cli.StringFlag{
-					Name:  "bind-address",
-					Value: server.BindAddress,
-				},
-				&cli.StringFlag{
-					Name:  "origin-server-name",
-					Value: hostname,
-				},
-				&cli.StringFlag{
-					Name:  "service-op-ip",
-					Value: "198.41.200.113:80",
-				},
-				&cli.StringFlag{
-					Name:  "management-hostname",
-					Value: "management.argotunnel.com",
-				}, &cli.BoolFlag{
-					Name:  "management-diagnostics",
-					Value: true,
-				}, &cli.StringFlag{
-					Name:  "quickURL",
-					Value: quickData.QuickURL,
-				}, &cli.StringFlag{
-					Name:  "url",
-					Value: "",
-				},
-			},
+	edgeTunnel := cfd.EdgeTunnelServer{
+		Token:        server.Token,
+		HaConn:       server.HaConn,
+		EdgeIPS:      edgeIPS,
+		EdgeBindAddr: net.ParseIP(server.BindAddress),
+		Proxy: &cfd.Proxy{
+			DialFunc: dialFunc,
+			Proxy4:   server.Warp.Proxy4,
+			Proxy6:   server.Warp.Proxy6,
 		},
 	}
-
-	_ = app.Run([]string{
-		os.Args[0],
-		"run",
-	})
+	for i := 0; i < server.HaConn; i++ {
+		go func(i int) {
+			err := edgeTunnel.Serve(i, clientID[:], info.CloudflaredVersion, info.GoArch)
+			if err != nil {
+				log.Errorln(err.Error())
+			}
+		}(i)
+	}
 }

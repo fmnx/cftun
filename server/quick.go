@@ -3,9 +3,8 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
-	"github.com/cloudflare/cloudflared/connection"
 	"github.com/fmnx/cftun/log"
+	"github.com/fmnx/cftun/server/cfd"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -74,7 +73,7 @@ func (qd *QuickData) Save() {
 	}
 }
 
-func ApplyQuickURL(buildInfo *cliutil.BuildInfo) (string, string, error) {
+func ApplyQuickURL(buildInfo *BuildInfo) (string, string, error) {
 	client := http.Client{
 		Transport: &http.Transport{
 			TLSHandshakeTimeout:   httpTimeout,
@@ -112,13 +111,13 @@ func ApplyQuickURL(buildInfo *cliutil.BuildInfo) (string, string, error) {
 		return "", "", errors.New("failed to parse quick Tunnel ID")
 	}
 
-	tunnelToken := connection.TunnelToken{
+	tunnelToken := cfd.TunnelToken{
 		AccountTag:   data.Result.AccountTag,
 		TunnelSecret: data.Result.Secret,
 		TunnelID:     tunnelID,
 	}
 
-	token, err := GenerateToken(&tunnelToken)
+	token, err := cfd.GenerateToken(&tunnelToken)
 	if err != nil {
 		return "", "", err
 	}

@@ -2,8 +2,8 @@ package client
 
 import (
 	"fmt"
-	tunToArgo "github.com/fmnx/cftun/client/tun2argo/engine"
-	"github.com/fmnx/cftun/client/tun2argo/proxy"
+	tunToArgo "github.com/fmnx/cftun/client/tun/engine"
+	"github.com/fmnx/cftun/client/tun/proxy"
 	"github.com/fmnx/cftun/log"
 	"os/exec"
 	"runtime"

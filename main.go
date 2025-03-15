@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
 	"github.com/fmnx/cftun/client"
 	"github.com/fmnx/cftun/log"
 	"github.com/fmnx/cftun/server"
@@ -70,7 +69,7 @@ func init() {
 }
 
 func main() {
-	bInfo := cliutil.GetBuildInfo(BuildType, CloudflaredVersion)
+	bInfo := server.GetBuildInfo(BuildType, CloudflaredVersion)
 	if showVersion {
 		printVersion(bInfo)
 		return
@@ -132,7 +131,7 @@ func main() {
 	}
 }
 
-func printVersion(buildInfo *cliutil.BuildInfo) {
-	fmt.Printf("GoOS: %s\nGoArch: %s\nGoVersion: %s\nBuildType: %s\nCftunVersion: %s\nBuildDate: %s\nChecksum: %s\n",
-		buildInfo.GoOS, buildInfo.GoArch, buildInfo.GoVersion, buildInfo.BuildType, Version, BuildDate, buildInfo.Checksum)
+func printVersion(buildInfo *server.BuildInfo) {
+	fmt.Printf("GoOS: %s\nGoArch: %s\nGoVersion: %s\nBuildType: %s\nCftunVersion: %s\nBuildDate: %s\n",
+		buildInfo.GoOS, buildInfo.GoArch, buildInfo.GoVersion, buildInfo.BuildType, Version, BuildDate)
 }

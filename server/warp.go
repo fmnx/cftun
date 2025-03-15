@@ -5,9 +5,8 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"github.com/cloudflare/cloudflared/ingress"
 	"github.com/fmnx/cftun/log"
+	"github.com/fmnx/cftun/server/cfd"
 	"github.com/tidwall/gjson"
 	"golang.zx2c4.com/wireguard/conn"
 	"golang.zx2c4.com/wireguard/device"
@@ -121,7 +120,7 @@ func (w *Warp) apply() {
 	log.Infoln("Warp has been successfully applied.")
 }
 
-func (w *Warp) Run() {
+func (w *Warp) Run() cfd.DialFunc {
 
 	if w.Auto {
 		w.load()
@@ -160,24 +159,14 @@ func (w *Warp) Run() {
 
 	dev.SetEndpoint(peer, resolvEndpoint(w.Endpoint)).SetAllowedIP(peer)
 	peer.HandlePostConfig()
-
-	ingress.Warp.Set(tnet.DialContext, w.Proxy4, w.Proxy6)
+	return tnet.Dial
 }
 
 func resolvEndpoint(endpoint string) string {
-	host, port, _ := net.SplitHostPort(endpoint)
-	c, err := net.DialTimeout("tcp6", "[2606:4700:4700::64]:443", 3*time.Second)
-	if err != nil { // ipv4-only
-		addr, err := net.ResolveIPAddr("ip4", host)
-		if err != nil {
-			log.Fatalln("Failed to resolve endpoint for warp.")
-		}
-		return fmt.Sprintf("%s:%s", addr.String(), port)
-	}
-	addr, err := net.ResolveIPAddr("ip6", host)
+	c, err := net.DialTimeout("udp", endpoint, 3*time.Second)
+	defer c.Close()
 	if err != nil {
-		log.Fatalln("Failed to resolve endpoint for warp.")
+		return "162.159.192.1:2408"
 	}
-	_ = c.Close()
-	return fmt.Sprintf("[%s]:%s", addr.String(), port)
+	return c.RemoteAddr().String()
 }

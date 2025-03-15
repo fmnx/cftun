@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	"github.com/fmnx/cftun/client/tun2argo/transport/argo"
+	"github.com/fmnx/cftun/client/tun/transport/argo"
 	"github.com/fmnx/cftun/log"
 	"github.com/gorilla/websocket"
 	"net"
@@ -74,4 +74,5 @@ func (w *Websocket) createWebsocketStream() (net.Conn, error) {
 	}
 
 	return &argo.GorillaConn{Conn: wsConn}, nil
+
 }
