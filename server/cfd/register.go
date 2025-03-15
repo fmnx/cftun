@@ -23,7 +23,7 @@ type ClientInfo struct {
 }
 
 type ConnectionOptions struct {
-	Client          ClientInfo
+	Client          *ClientInfo
 	ReplaceExisting bool
 }
 

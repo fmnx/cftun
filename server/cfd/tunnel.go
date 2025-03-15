@@ -18,6 +18,7 @@ type EdgeTunnelServer struct {
 	EdgeBindAddr net.IP
 	NsResult     []string
 	Proxy        *Proxy
+	ClientInfo   *ClientInfo
 }
 
 func (e *EdgeTunnelServer) getEdgeIP(index int) netip.AddrPort {
@@ -49,7 +50,7 @@ func (e *EdgeTunnelServer) getEdgeIP(index int) netip.AddrPort {
 	}
 }
 
-func (e *EdgeTunnelServer) Serve(connIndex int, clientID []byte, version, arch string) error {
+func (e *EdgeTunnelServer) Serve(connIndex int) error {
 
 	ctx := context.Background()
 
@@ -62,11 +63,7 @@ func (e *EdgeTunnelServer) Serve(connIndex int, clientID []byte, version, arch s
 	}
 
 	connOptions := &ConnectionOptions{
-		Client: ClientInfo{
-			ClientID: clientID,
-			Version:  version,
-			Arch:     arch,
-		},
+		Client:          e.ClientInfo,
 		ReplaceExisting: true,
 	}
 

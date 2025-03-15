@@ -83,10 +83,15 @@ func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 			Proxy4:   server.Warp.Proxy4,
 			Proxy6:   server.Warp.Proxy6,
 		},
+		ClientInfo: &cfd.ClientInfo{
+			ClientID: clientID[:],
+			Version:  info.CloudflaredVersion,
+			Arch:     info.GoArch,
+		},
 	}
 	for i := 0; i < server.HaConn; i++ {
 		go func(i int) {
-			err := edgeTunnel.Serve(i, clientID[:], info.CloudflaredVersion, info.GoArch)
+			err := edgeTunnel.Serve(i)
 			if err != nil {
 				log.Errorln(err.Error())
 			}
