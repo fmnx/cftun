@@ -103,6 +103,7 @@ func ApplyQuickURL(buildInfo *BuildInfo) (string, string, error) {
 	}
 	var data QuickTunnelResponse
 	if err := json.Unmarshal(rspBody, &data); err != nil {
+		log.Errorln(err.Error())
 		return "", "", errors.New("failed to unmarshal quick Tunnel")
 	}
 

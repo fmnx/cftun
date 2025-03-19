@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"sync/atomic"
 	"time"
 )
 
@@ -19,9 +18,7 @@ type Websocket struct {
 	Address  string
 	wsDialer *websocket.Dialer
 
-	poolSize  int32
-	connPool  chan net.Conn
-	connCount *atomic.Int32
+	connPool chan net.Conn
 }
 
 func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
@@ -34,12 +31,12 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 	}
 
 	wsDialer := &websocket.Dialer{
-		TLSClientConfig:  nil,
-		Proxy:            http.ProxyFromEnvironment,
-		HandshakeTimeout: time.Second,
-		//ReadBufferSize:    20480,
-		//WriteBufferSize:   20480,
-		//EnableCompression: true,
+		TLSClientConfig:   nil,
+		Proxy:             http.ProxyFromEnvironment,
+		HandshakeTimeout:  time.Second,
+		ReadBufferSize:    32 << 10,
+		WriteBufferSize:   32 << 10,
+		EnableCompression: true,
 	}
 
 	address := fmt.Sprintf("%s:%d", cdnIP, port)
@@ -66,9 +63,7 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 		Address:  address,
 		Url:      fmt.Sprintf("%s://%s%s", scheme, host, path),
 
-		connCount: &atomic.Int32{},
-		poolSize:  int32(poolSize),
-		connPool:  make(chan net.Conn, poolSize),
+		connPool: make(chan net.Conn, poolSize),
 	}
 	go ws.ensureConnectionPoolSize()
 	return ws
@@ -82,7 +77,6 @@ func (w *Websocket) ensureConnectionPoolSize() {
 			continue
 		}
 		w.connPool <- conn
-		w.connCount.Add(1)
 	}
 }
 
@@ -95,24 +89,13 @@ func (w *Websocket) connect() (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	//wsConn.SetCloseHandler(func(code int, text string) error {
-	//	println("websocket close with code: ", code, "msg: ", text)
-	//	return nil
-	//})
-	//
-	//wsConn.SetPongHandler(func(appData string) error {
-	//	println("pongHandler: ", appData)
-	//	return nil
-	//})
 
 	return &GorillaConn{Conn: wsConn}, nil
-	//return wsConn.NetConn(), nil
 }
 
 func (w *Websocket) Dial() (net.Conn, error) {
 	select {
 	case conn := <-w.connPool:
-		w.connCount.Add(-1)
 		return conn, nil
 	default:
 		return w.connect()

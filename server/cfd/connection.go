@@ -121,7 +121,10 @@ func (q *QuicConnection) handleQuicStream(quicStream quic.Stream) {
 		return
 	}
 	if network != "" && address != "" {
-		remoteConn, _ = q.DialWithRetry(network, address, 3)
+		remoteConn, err = q.DialWithRetry(network, address, 3)
+		if err != nil {
+			return
+		}
 	}
 
 	wsCtx, cancel := context.WithCancel(ctx)
@@ -199,16 +202,20 @@ func handleRemoteConn(ctx context.Context, cancel context.CancelFunc, remoteConn
 		cancel()
 		wsConn.Close()
 		_ = remoteConn.Close()
-		if err != nil {
-			fmt.Printf("handleRemoteConn exit: %v\n", err)
-
-		}
+		//if err != nil {
+		//	fmt.Printf("handleRemoteConn exit: %v\n", err)
+		//
+		//}
 	}()
 
 	setReadDeadline := func(c net.Conn) error { return nil }
 	if _, ok := remoteConn.(*net.UDPConn); ok {
+		udpTimeout := 60 * time.Second
+		if remoteConn.RemoteAddr().(*net.UDPAddr).Port == 53 { // DNS query
+			udpTimeout = 1 * time.Second
+		}
 		setReadDeadline = func(c net.Conn) error {
-			return c.SetReadDeadline(time.Now().Add(60 * time.Second))
+			return c.SetReadDeadline(time.Now().Add(udpTimeout))
 		}
 	}
 
@@ -222,15 +229,17 @@ func handleRemoteConn(ctx context.Context, cancel context.CancelFunc, remoteConn
 			if err != nil {
 				return
 			}
-			nr, err := remoteConn.Read(buf)
+			var nr, nw int
+			nr, err = remoteConn.Read(buf)
 			if err != nil {
 				return
 			}
-			nw, err := wsConn.Write(buf[:nr])
+			nw, err = wsConn.Write(buf[:nr])
 			if err != nil {
 				return
 			}
 			if nw != nr {
+				err = errors.New("short write")
 				return
 			}
 		}

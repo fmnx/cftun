@@ -57,8 +57,10 @@ func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 	}
 
 	dialFunc := net.Dial
+	var proxy4, proxy6 bool
 	if server.Warp != nil && (server.Warp.Proxy4 || server.Warp.Proxy6) {
 		dialFunc = server.Warp.Run()
+		proxy4, proxy6 = server.Warp.Proxy4, server.Warp.Proxy6
 	}
 
 	clientID, _ := uuid.NewRandom()
@@ -80,8 +82,8 @@ func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 		EdgeBindAddr: net.ParseIP(server.BindAddress),
 		Proxy: &cfd.Proxy{
 			DialFunc: dialFunc,
-			Proxy4:   server.Warp.Proxy4,
-			Proxy6:   server.Warp.Proxy6,
+			Proxy4:   proxy4,
+			Proxy6:   proxy6,
 		},
 		ClientInfo: &cfd.ClientInfo{
 			ClientID: clientID[:],
