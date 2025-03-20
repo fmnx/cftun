@@ -170,7 +170,7 @@ The JSON configuration file contains two main sections:
 }
 ```
 
-### Client configuration using Tun：
+### The following is the client configuration file using TUN mode：
 
 ```json
 {
@@ -193,7 +193,7 @@ The JSON configuration file contains two main sections:
 }
 ```
 
-### Client configuration using global-url:
+### The following is the client configuration file using tunnel mode.:
 
 ```json
 {

@@ -194,7 +194,7 @@ go build
 }
 ```
 
-### 以下是client使用`global-url`的示例配置文件：
+### 以下是client使用隧道模式配置文件：
 
 ```json
 {
