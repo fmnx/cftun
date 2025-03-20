@@ -126,7 +126,10 @@ go build
       tun设备日志级别，[debug|info|warn|error|silent], 默认为`info`。
 
     - **routes** (可选)  
-      tun设备路由配置规则。
+      tun设备路由匹配规则。
+
+    - **ex-routes** (可选)  
+      tun设备路由排除规则。
 
 - **tunnels** (可选)  
   隧道配置列表，每个隧道包含以下配置：
@@ -221,43 +224,6 @@ go build
       {
         "listen": "127.0.0.1:5201",
         "remote": "127.0.0.1:5201",
-        "protocol": "tcp"
-      }
-    ]
-  }
-}
-```
-
-### 以下是client使用独立`url`的示例配置文件：
-
-```json
-{
-  "client": {
-    "cdn-ip": "104.17.143.163",
-    "cdn-port": 80,
-    "scheme": "ws",
-    "global-url": "",
-    "tunnels": [
-      {
-        "listen": "127.0.0.1:2408",
-        "url": "warp.example.com",
-        "protocol": "udp",
-        "timeout": 30
-      },
-      {
-        "listen": "127.0.0.1:2222",
-        "url": "ssh.example.com",
-        "protocol": "tcp"
-      },
-      {
-        "listen": "127.0.0.1:5201",
-        "url": "iperf3.example.com/udp",
-        "protocol": "udp",
-        "timeout": 30
-      },
-      {
-        "listen": "127.0.0.1:5201",
-        "url": "iperf3.example.com/tcp",
         "protocol": "tcp"
       }
     ]

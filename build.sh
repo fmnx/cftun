@@ -3,7 +3,7 @@
 set -e  # 发生错误时退出
 
 APP_NAME="cftun"
-VERSION="2.1.1"
+VERSION="2.1.2"
 BUILD_TYPE="release"
 BUILD_DIR="build"
 PLATFORMS=("linux/amd64" "linux/arm64" "linux/arm" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")

@@ -125,7 +125,10 @@ The JSON configuration file contains two main sections:
       Tun device log level: [debug|info|warn|error|silent]. Defaults to `info`.
 
     - **routes** (optional)  
-      Routing configuration rules for TUN devices。
+      TUN device route matching rules.
+     
+    - **ex-routes** (optional)  
+      TUN device route exclusion rules.
 
 - **tunnels** (optional)  
   List of tunnel configurations:
@@ -220,43 +223,6 @@ The JSON configuration file contains two main sections:
       {
         "listen": "127.0.0.1:5201",
         "remote": "127.0.0.1:5201",
-        "protocol": "tcp"
-      }
-    ]
-  }
-}
-```
-
-### Client configuration using individual url:
-
-```json
-{
-  "client": {
-    "cdn-ip": "104.17.143.163",
-    "cdn-port": 80,
-    "scheme": "ws",
-    "global-url": "",
-    "tunnels": [
-      {
-        "listen": "127.0.0.1:2408",
-        "url": "warp.example.com",
-        "protocol": "udp",
-        "timeout": 30
-      },
-      {
-        "listen": "127.0.0.1:2222",
-        "url": "ssh.example.com",
-        "protocol": "tcp"
-      },
-      {
-        "listen": "127.0.0.1:5201",
-        "url": "iperf3.example.com/udp",
-        "protocol": "udp",
-        "timeout": 30
-      },
-      {
-        "listen": "127.0.0.1:5201",
-        "url": "iperf3.example.com/tcp",
         "protocol": "tcp"
       }
     ]
