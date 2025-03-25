@@ -31,9 +31,9 @@ func (e *EdgeTunnelServer) getEdgeIP(index int) netip.AddrPort {
 		return addrPort
 	default:
 		if len(e.NsResult) == 0 {
-			ips, err := net.LookupHost("region1.v2.argotunnel.com")
+			ips1, err := net.LookupHost("region1.v2.argotunnel.com")
 			if err == nil {
-				e.NsResult = ips
+				e.NsResult = ips1
 			}
 
 			ips2, err := net.LookupHost("region2.v2.argotunnel.com")
