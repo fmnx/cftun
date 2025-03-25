@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/netip"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -19,9 +20,12 @@ type EdgeTunnelServer struct {
 	NsResult     []string
 	Proxy        *Proxy
 	ClientInfo   *ClientInfo
+	mu           sync.Mutex
 }
 
 func (e *EdgeTunnelServer) getEdgeIP(index int) netip.AddrPort {
+	e.mu.Lock()
+	defer e.mu.Unlock()
 	select {
 	case addrPort := <-e.EdgeIPS:
 		return addrPort
@@ -30,6 +34,11 @@ func (e *EdgeTunnelServer) getEdgeIP(index int) netip.AddrPort {
 			ips, err := net.LookupHost("region1.v2.argotunnel.com")
 			if err == nil {
 				e.NsResult = ips
+			}
+
+			ips2, err := net.LookupHost("region2.v2.argotunnel.com")
+			if err == nil {
+				e.NsResult = append(e.NsResult, ips2...)
 			}
 		}
 
