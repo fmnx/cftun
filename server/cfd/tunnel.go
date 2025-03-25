@@ -132,18 +132,5 @@ func (e *EdgeTunnelServer) serveQUIC(
 		return err
 	}
 
-	err = tunnelConn.Serve(ctx, credentials, connOptions)
-	for err != nil {
-		log.Errorln(err.Error())
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			err = tunnelConn.Serve(ctx, credentials, connOptions)
-		}
-		time.Sleep(3 * time.Second)
-	}
-
-	return err
-
+	return tunnelConn.Serve(ctx, credentials, connOptions)
 }

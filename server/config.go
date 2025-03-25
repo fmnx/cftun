@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/netip"
 	"runtime"
+	"time"
 )
 
 type BuildInfo struct {
@@ -94,8 +95,10 @@ func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 	for i := 0; i < server.HaConn; i++ {
 		go func(i int) {
 			err := edgeTunnel.Serve(i)
-			if err != nil {
+			for err != nil {
 				log.Errorln(err.Error())
+				err = edgeTunnel.Serve(i)
+				time.Sleep(3 * time.Second)
 			}
 		}(i)
 	}

@@ -78,10 +78,7 @@ func (q *QuicConnection) Serve(ctx context.Context, credentials *Credentials, co
 		time.Sleep(1 * time.Second)
 	}
 
-	err = q.acceptStream(ctx)
-
-	return err
-
+	return q.acceptStream(ctx)
 }
 
 func (q *QuicConnection) acceptStream(ctx context.Context) error {
