@@ -93,13 +93,14 @@ func (server *Config) Run(info *BuildInfo, quickData *QuickData) {
 		},
 	}
 	for i := 0; i < server.HaConn; i++ {
-		go func(i int) {
-			err := edgeTunnel.Serve(i)
-			for err != nil {
-				log.Errorln(err.Error())
-				err = edgeTunnel.Serve(i)
+		connIndex := i
+		go func() {
+			for {
+				if err := edgeTunnel.Serve(connIndex); err != nil {
+					log.Errorln(err.Error())
+				}
 				time.Sleep(3 * time.Second)
 			}
-		}(i)
+		}()
 	}
 }
