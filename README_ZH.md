@@ -63,6 +63,9 @@ go build
     - **auto** (可选)  
       是否自动申请warp.默认值为`false` [true|false]
 
+    - **port** (可选)  
+      wireguard 本地监听端口。
+
     - **endpoint** (可选)  
       wireguard 终端。当`auto`为`false`时，此项必填。
 

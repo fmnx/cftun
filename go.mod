@@ -2,7 +2,7 @@ module github.com/fmnx/cftun
 
 go 1.23.1
 
-replace golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 => github.com/fmnx/wireguard-go v0.0.0-20250315044756-2dc2e39026c8
+replace golang.zx2c4.com/wireguard v0.0.0-20231211153847-12269c276173 => github.com/fmnx/wireguard-go v0.0.0-20250326095939-28da4db2ad05
 
 require (
 	github.com/gobwas/ws v1.4.0

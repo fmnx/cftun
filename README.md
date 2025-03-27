@@ -62,6 +62,9 @@ The JSON configuration file contains two main sections:
     - **auto** (optional)  
       Whether to automatically apply for warp. Default: false [true|false]
 
+    - **port** (optional)  
+      WireGuard local listening port.
+
     - **endpoint** (optional)  
       WireGuard endpoint. Required when `auto` is `false`.
 

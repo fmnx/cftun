@@ -22,6 +22,7 @@ import (
 
 type Warp struct {
 	Auto       bool   `yaml:"auto" json:"auto"`
+	Port       uint16 `yaml:"port" json:"port"`
 	Endpoint   string `yaml:"endpoint" json:"endpoint"`
 	IPv4       string `yaml:"ipv4" json:"ipv4"`
 	IPv6       string `yaml:"ipv6" json:"ipv6"`
@@ -154,6 +155,7 @@ func (w *Warp) Run() cfd.DialFunc {
 	}
 	logger := device.NewLogger(1, "")
 	dev := device.NewDevice(tunDev, bind, logger)
+	dev.SetPort(w.Port)
 	dev.SetPrivateKey(w.PrivateKey)
 	peer := dev.SetPublicKey(w.PublicKey)
 

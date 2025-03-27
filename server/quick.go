@@ -101,6 +101,11 @@ func ApplyQuickURL(buildInfo *BuildInfo) (string, string, error) {
 	if err != nil {
 		return "", "", errors.New("failed to read quick-tunnel response")
 	}
+
+	if string(rspBody) == "error code: 1015" {
+		println("limit")
+	}
+
 	var data QuickTunnelResponse
 	if err := json.Unmarshal(rspBody, &data); err != nil {
 		log.Errorln(err.Error())
