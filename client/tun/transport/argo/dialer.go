@@ -1,6 +1,7 @@
 package argo
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fmnx/cftun/client/tun/dialer"
 	"github.com/gorilla/websocket"
@@ -18,6 +19,7 @@ type Websocket struct {
 	Address  string
 	wsDialer *websocket.Dialer
 
+	stopChan chan struct{}
 	connPool chan net.Conn
 }
 
@@ -63,20 +65,34 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 		Address:  address,
 		Url:      fmt.Sprintf("%s://%s%s", scheme, host, path),
 
+		stopChan: make(chan struct{}),
 		connPool: make(chan net.Conn, poolSize),
 	}
-	go ws.ensureConnectionPoolSize()
 	return ws
 }
 
-func (w *Websocket) ensureConnectionPoolSize() {
-	for {
+func (w *Websocket) Close() {
+	close(w.stopChan)
+	for conn := range w.connPool {
+		go conn.Close()
+	}
+}
+
+func (w *Websocket) preDial() {
+	select {
+	case <-w.stopChan:
+		return
+	default:
 		conn, err := w.connect()
 		if err != nil {
-			time.Sleep(500 * time.Millisecond)
-			continue
+			return
 		}
-		w.connPool <- conn
+		select {
+		case w.connPool <- conn:
+			return
+		default:
+			_ = conn.Close()
+		}
 	}
 }
 
@@ -94,7 +110,10 @@ func (w *Websocket) connect() (net.Conn, error) {
 }
 
 func (w *Websocket) Dial() (net.Conn, error) {
+	defer func() { go w.preDial() }()
 	select {
+	case <-w.stopChan:
+		return nil, errors.New("websocket has been closed")
 	case conn := <-w.connPool:
 		return conn, nil
 	default:

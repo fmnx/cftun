@@ -24,6 +24,8 @@ var (
 
 	// Stack holds the default stack for the engine.
 	Stack *stack.Stack
+
+	ArgoProxy *proxy.Argo
 )
 
 // Stop shuts the default engine down.
@@ -38,6 +40,9 @@ func stop() (err error) {
 	if Device != nil {
 		Device.Close()
 	}
+	if ArgoProxy != nil {
+		ArgoProxy.Close()
+	}
 	if Stack != nil {
 		Stack.Close()
 		Stack.Wait()
@@ -47,6 +52,7 @@ func stop() (err error) {
 }
 
 func HandleNetStack(argoProxy *proxy.Argo, device, interfaceName, logLevel string, mtu int) (err error) {
+	ArgoProxy = argoProxy
 	buffer.RelayBufferSize = mtu
 	level, err := log.ParseLevel(logLevel)
 	if err != nil {

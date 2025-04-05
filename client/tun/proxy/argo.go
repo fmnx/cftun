@@ -12,6 +12,10 @@ type Argo struct {
 	ws *argo.Websocket
 }
 
+func (a *Argo) Close() {
+	a.ws.Close()
+}
+
 func (a *Argo) Addr() string {
 	return a.ws.Url
 }
