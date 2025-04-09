@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fmnx/cftun/client/tun/dialer"
+	"github.com/fmnx/cftun/client/tun/metadata"
 	"github.com/gorilla/websocket"
 	"net"
 	"net/http"
@@ -83,7 +84,7 @@ func (w *Websocket) preDial() {
 	case <-w.stopChan:
 		return
 	default:
-		conn, err := w.connect()
+		conn, err := w.connect(nil)
 		if err != nil {
 			return
 		}
@@ -96,8 +97,21 @@ func (w *Websocket) preDial() {
 	}
 }
 
-func (w *Websocket) connect() (net.Conn, error) {
-	wsConn, resp, err := w.wsDialer.Dial(w.Url, w.headers)
+func (w *Websocket) header(metadata *metadata.Metadata) http.Header {
+	if metadata == nil {
+		return w.headers
+	}
+
+	header := make(http.Header, len(w.headers))
+	header.Set("Host", w.headers.Get("Host"))
+	header.Set("User-Agent", "DEV")
+	header.Set("Forward-Dest", metadata.DestinationAddress())
+	header.Set("Forward-Proto", metadata.Network.String())
+	return header
+}
+
+func (w *Websocket) connect(metadata *metadata.Metadata) (net.Conn, error) {
+	wsConn, resp, err := w.wsDialer.Dial(w.Url, w.header(metadata))
 	if resp != nil && resp.Body != nil {
 		_ = resp.Body.Close()
 	}
@@ -109,14 +123,17 @@ func (w *Websocket) connect() (net.Conn, error) {
 	return &GorillaConn{Conn: wsConn}, nil
 }
 
-func (w *Websocket) Dial() (net.Conn, error) {
+func (w *Websocket) Dial(metadata *metadata.Metadata) (conn net.Conn, headerSent bool, err error) {
 	defer func() { go w.preDial() }()
 	select {
 	case <-w.stopChan:
-		return nil, errors.New("websocket has been closed")
-	case conn := <-w.connPool:
-		return conn, nil
+		err = errors.New("websocket has been closed")
+		return
+	case conn = <-w.connPool:
+		return
 	default:
-		return w.connect()
+		conn, err = w.connect(metadata)
+		headerSent = true
+		return
 	}
 }

@@ -41,7 +41,7 @@ func stop() (err error) {
 		Device.Close()
 	}
 	if ArgoProxy != nil {
-		ArgoProxy.Close()
+		go ArgoProxy.Close()
 	}
 	if Stack != nil {
 		Stack.Close()

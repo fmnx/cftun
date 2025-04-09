@@ -31,9 +31,13 @@ func NewArgo(scheme, cdnIP, url string, port int) *Argo {
 }
 
 func (a *Argo) Dial(metadata *M.Metadata) (net.Conn, error) {
-	c, err := a.ws.Dial()
+	c, headerSent, err := a.ws.Dial(metadata)
 	if err != nil {
 		return nil, err
+	}
+
+	if headerSent {
+		return c, nil
 	}
 
 	conn := &argoConn{
