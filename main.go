@@ -67,8 +67,8 @@ func init() {
 		fmt.Printf("  -c,--config\tSpecify the path to the config file.(default: \"./config.json\")\n")
 		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
 		fmt.Printf("  -q,--quick\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
-		fmt.Printf("  -4,--proxy4\tUse the WARP proxy for IPv4 traffic; only effective when using the -q mode.\n")
-		fmt.Printf("  -6,--proxy6\tUse the WARP proxy for IPv6 traffic; only effective when using the -q mode.\n")
+		fmt.Printf("  -4,--proxy4\tUse the WARP proxy for IPv4 traffic; only effective in command-line mode.\n")
+		fmt.Printf("  -6,--proxy6\tUse the WARP proxy for IPv4 traffic; only effective in command-line mode.\n")
 		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
 	}
 	pflag.Parse()
@@ -82,16 +82,15 @@ func main() {
 	}
 	if token != "" || isQuick { // command line.
 		var warp *server.Warp
+		if proxy4 || proxy6 {
+			warp = &server.Warp{
+				Auto:   true,
+				Proxy4: proxy4,
+				Proxy6: proxy6,
+			}
+		}
 		if isQuick {
 			token = "quick"
-			if proxy4 || proxy6 {
-				warp = &server.Warp{
-					Auto:   true,
-					Proxy4: proxy4,
-					Proxy6: proxy6,
-				}
-			}
-
 		} else if token == "quick" {
 			isQuick = true
 		}
