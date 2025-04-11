@@ -43,6 +43,8 @@ var (
 	configFile         string
 	token              string
 	isQuick            bool
+	proxy4             bool
+	proxy6             bool
 	Version            = "unknown"
 	BuildDate          = "unknown"
 	BuildType          = "DEV"
@@ -56,6 +58,8 @@ func init() {
 	pflag.StringVarP(&configFile, "config", "c", "./config.json", "")
 	pflag.StringVarP(&token, "token", "t", "", "")
 	pflag.BoolVarP(&isQuick, "quick", "q", false, "")
+	pflag.BoolVarP(&proxy4, "proxy4", "4", false, "")
+	pflag.BoolVarP(&proxy6, "proxy6", "6", false, "")
 	pflag.BoolVarP(&showVersion, "version", "v", false, "")
 
 	pflag.Usage = func() {
@@ -63,6 +67,8 @@ func init() {
 		fmt.Printf("  -c,--config\tSpecify the path to the config file.(default: \"./config.json\")\n")
 		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
 		fmt.Printf("  -q,--quick\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
+		fmt.Printf("  -4,--proxy4\tUse the WARP proxy for IPv4 traffic; only effective when using the -q mode.\n")
+		fmt.Printf("  -6,--proxy6\tUse the WARP proxy for IPv6 traffic; only effective when using the -q mode.\n")
 		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
 	}
 	pflag.Parse()
@@ -75,14 +81,24 @@ func main() {
 		return
 	}
 	if token != "" || isQuick { // command line.
+		var warp *server.Warp
 		if isQuick {
 			token = "quick"
+			if proxy4 || proxy6 {
+				warp = &server.Warp{
+					Auto:   true,
+					Proxy4: proxy4,
+					Proxy6: proxy6,
+				}
+			}
+
 		} else if token == "quick" {
 			isQuick = true
 		}
 		srv := &server.Config{
 			Token:  token,
 			HaConn: 4,
+			Warp:   warp,
 		}
 		go srv.Run(bInfo, quickData)
 	} else {
