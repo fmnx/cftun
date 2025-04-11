@@ -45,10 +45,11 @@ var (
 	isQuick            bool
 	proxy4             bool
 	proxy6             bool
+	port               int
 	Version            = "unknown"
 	BuildDate          = "unknown"
 	BuildType          = "DEV"
-	CloudflaredVersion = "2025.2.0"
+	CloudflaredVersion = "2025.4.1"
 	showVersion        bool
 	quickData          = &server.QuickData{}
 	tunName            string
@@ -60,6 +61,7 @@ func init() {
 	pflag.BoolVarP(&isQuick, "quick", "q", false, "")
 	pflag.BoolVarP(&proxy4, "proxy4", "4", false, "")
 	pflag.BoolVarP(&proxy6, "proxy6", "6", false, "")
+	pflag.IntVarP(&port, "port", "p", 51280, "")
 	pflag.BoolVarP(&showVersion, "version", "v", false, "")
 
 	pflag.Usage = func() {
@@ -67,8 +69,9 @@ func init() {
 		fmt.Printf("  -c,--config\tSpecify the path to the config file.(default: \"./config.json\")\n")
 		fmt.Printf("  -t,--token\tWhen a token is provided, the configuration file will be ignored and the program will run in server mode only.\n")
 		fmt.Printf("  -q,--quick\tTemporary server, no Cloudflare account required, based on try.cloudflare.com.\n")
-		fmt.Printf("  -4,--proxy4\tUse the WARP proxy for IPv4 traffic; only effective in command-line mode.\n")
-		fmt.Printf("  -6,--proxy6\tUse the WARP proxy for IPv4 traffic; only effective in command-line mode.\n")
+		fmt.Printf("  -4,--proxy4\tUse the WARP proxy for IPv4 traffic; Ignored when using a configuration file.\n")
+		fmt.Printf("  -6,--proxy6\tUse the WARP proxy for IPv4 traffic; Ignored when using a configuration file.\n")
+		fmt.Printf("  -p,--port\tSet the local port for WARP; Ignored when using a configuration file.\n")
 		fmt.Printf("  -v,--version\tDisplay the current binary file version.\n")
 	}
 	pflag.Parse()
@@ -85,6 +88,7 @@ func main() {
 		if proxy4 || proxy6 {
 			warp = &server.Warp{
 				Auto:   true,
+				Port:   uint16(port),
 				Proxy4: proxy4,
 				Proxy6: proxy6,
 			}
