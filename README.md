@@ -139,8 +139,8 @@ The JSON configuration file contains two main sections:
     - **listen** (required)  
       Local listening address and port (recommend 127.0.0.1).
 
-    - **remote** (optional)  
-      Forward to specified target address (empty uses dashboard configuration).
+    - **remote** (required)  
+      Forward to specified target address.
 
     - **url** (optional)  
       Priority configuration (uses global-url if empty).
