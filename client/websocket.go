@@ -48,10 +48,8 @@ func NewWebsocket(config *Config, tunnel *Tunnel) *Websocket {
 	headers := make(http.Header)
 	headers.Set("Host", host)
 	headers.Set("User-Agent", "DEV")
-	if tunnel.Remote != "" {
-		headers.Set("Forward-Dest", tunnel.Remote)
-		headers.Set("Forward-Proto", tunnel.Protocol)
-	}
+	headers.Set("Forward-Dest", tunnel.Remote)
+	headers.Set("Forward-Proto", tunnel.Protocol)
 
 	return &Websocket{
 		wsDialer: wsDialer,

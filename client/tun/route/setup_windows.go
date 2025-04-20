@@ -78,7 +78,7 @@ func configureRouteImpl(tunName, ipv4, ipv6 string, routes, exRoutes []string) {
 
 	if len(exRoutes) > 0 {
 		idx4, gateway4 := getIPv4DefaultGateway()
-		idx6, gateway6 := getIPv4DefaultGateway()
+		idx6, gateway6 := getIPv6DefaultGateway()
 
 		for _, route := range exRoutes {
 			if strings.Contains(route, ":") {
