@@ -24,11 +24,17 @@ func getDefaultGateway(is6 bool) (idx, gateway string) {
 		return
 	}
 	lines := strings.Split(string(out), "\n")
+	metric := int64(65536)
 	for _, line := range lines {
 		if strings.Contains(line, substr) {
 			parts := strings.Fields(line)
 			if len(parts) >= 6 {
-				return parts[4], parts[5] // 网关地址
+				newMetric, pe := strconv.ParseInt(parts[2], 10, 64)
+				if pe != nil || newMetric >= metric {
+					continue
+				}
+				metric = newMetric
+				idx, gateway = parts[4], parts[5] // 网关地址
 			}
 		}
 	}
