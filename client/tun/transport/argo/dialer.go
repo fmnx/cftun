@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -42,10 +43,7 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 		EnableCompression: true,
 	}
 
-	address := fmt.Sprintf("%s:%d", cdnIP, port)
-	if strings.Contains(cdnIP, ":") {
-		address = fmt.Sprintf("[%s]:%d", cdnIP, port)
-	}
+	address := net.JoinHostPort(cdnIP, strconv.Itoa(port))
 	wsDialer.NetDial = func(network, addr string) (net.Conn, error) {
 		if cdnIP != "" {
 			return dialer.Dial(network, address)
