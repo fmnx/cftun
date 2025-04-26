@@ -113,6 +113,9 @@ go build
     - **name** (可选)  
       tun设备名，默认为`cftun0`。
 
+    - **poll-size** (可选)
+      预建立的 WebSocket 连接的最大数量。
+
     - **ipv4** (可选)  
       自定义tun设备ipv4地址。
 

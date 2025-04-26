@@ -107,10 +107,13 @@ The JSON configuration file contains two main sections:
   Tun device configuration.
 
     - **enable** (optional)  
-      Enable the tun device. Default is false. [true|false]
+      Enable the tun device. Defaults to false. [true|false]
 
     - **name** (optional)  
       Tun device name. Defaults to `cftun0`.
+
+    - **poll-size** (optional)
+      The maximum number of pre-established WebSocket connections.
 
     - **ipv4** (optional)  
       Custom TUN device IPv4 address.

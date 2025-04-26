@@ -24,9 +24,9 @@ func (a *Argo) Host() string {
 	return a.ws.Address
 }
 
-func NewArgo(scheme, cdnIP, url string, port int) *Argo {
+func NewArgo(params *argo.Params) *Argo {
 	return &Argo{
-		ws: argo.NewWebsocket(scheme, cdnIP, url, port),
+		ws: argo.NewWebsocket(params),
 	}
 }
 

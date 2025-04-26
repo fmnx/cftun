@@ -4,6 +4,7 @@ import (
 	tunToArgo "github.com/fmnx/cftun/client/tun/engine"
 	"github.com/fmnx/cftun/client/tun/proxy"
 	"github.com/fmnx/cftun/client/tun/route"
+	"github.com/fmnx/cftun/client/tun/transport/argo"
 	"github.com/fmnx/cftun/log"
 	"os/exec"
 	"runtime"
@@ -50,9 +51,9 @@ func (t *Tun) mtu() int {
 
 }
 
-func (t *Tun) Run(scheme, cdnIP, url string, port int) {
+func (t *Tun) Run(params *argo.Params) {
 
-	argoProxy := proxy.NewArgo(scheme, cdnIP, url, port)
+	argoProxy := proxy.NewArgo(params)
 	err := tunToArgo.HandleNetStack(argoProxy, t.Name, t.Interface, t.LogLevel, t.mtu())
 	if err != nil {
 		log.Fatalln(err.Error())

@@ -10,29 +10,36 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
-type Websocket struct {
-	headers  http.Header
-	cdnIP    string
-	Url      string
-	Scheme   string
-	Address  string
-	wsDialer *websocket.Dialer
-
-	stopChan chan struct{}
-	connPool chan net.Conn
+type Params struct {
+	Scheme   string `json:"scheme"`
+	CdnIP    string `json:"cdn-ip"`
+	Url      string `json:"url"`
+	Port     int    `json:"port"`
+	PoolSize int32  `json:"pool-size"`
 }
 
-func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
+type Websocket struct {
+	params   *Params
+	headers  http.Header
+	wsDialer *websocket.Dialer
+	Url      string
+	Address  string
 
-	hostPath := strings.Split(Url, "/")
+	mu        sync.Mutex
+	connCount *atomic.Int32
+	stopChan  chan struct{}
+	connPool  chan net.Conn
+}
+
+func NewWebsocket(params *Params) *Websocket {
+
+	hostPath := strings.Split(params.Url, "/")
 	host := hostPath[0]
-	path := ""
-	if len(hostPath) > 1 {
-		path = hostPath[1]
-	}
 
 	wsDialer := &websocket.Dialer{
 		TLSClientConfig:   nil,
@@ -43,9 +50,9 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 		EnableCompression: true,
 	}
 
-	address := net.JoinHostPort(cdnIP, strconv.Itoa(port))
+	address := net.JoinHostPort(params.CdnIP, strconv.Itoa(params.Port))
 	wsDialer.NetDial = func(network, addr string) (net.Conn, error) {
-		if cdnIP != "" {
+		if params.CdnIP != "" {
 			return dialer.Dial(network, address)
 		}
 		return dialer.Dial(network, addr)
@@ -55,17 +62,16 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 	headers.Set("Host", host)
 	headers.Set("User-Agent", "DEV")
 
-	poolSize := 30
 	ws := &Websocket{
+		params:   params,
 		wsDialer: wsDialer,
 		headers:  headers,
-		cdnIP:    cdnIP,
-		Scheme:   scheme,
 		Address:  address,
-		Url:      fmt.Sprintf("%s://%s%s", scheme, host, path),
+		Url:      fmt.Sprintf("%s://%s", params.Scheme, host),
 
-		stopChan: make(chan struct{}),
-		connPool: make(chan net.Conn, poolSize),
+		connCount: &atomic.Int32{},
+		stopChan:  make(chan struct{}),
+		connPool:  make(chan net.Conn, params.PoolSize),
 	}
 	return ws
 }
@@ -73,11 +79,16 @@ func NewWebsocket(scheme, cdnIP, Url string, port int) *Websocket {
 func (w *Websocket) Close() {
 	close(w.stopChan)
 	for conn := range w.connPool {
-		go conn.Close()
+		_ = conn.Close()
 	}
 }
 
 func (w *Websocket) preDial() {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.connCount.Load() >= w.params.PoolSize {
+		return
+	}
 	select {
 	case <-w.stopChan:
 		return

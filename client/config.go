@@ -2,6 +2,7 @@ package client
 
 import (
 	"fmt"
+	"github.com/fmnx/cftun/client/tun/transport/argo"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ type Tunnel struct {
 type Config struct {
 	CdnIp     string    `yaml:"cdn-ip" json:"cdn-ip"`
 	CdnPort   int       `yaml:"cdn-port" json:"cdn-port"`
+	PoolSize  int32     `yaml:"pool-size" json:"pool-size"`
 	GlobalUrl string    `yaml:"global-url" json:"global-url"`
 	Scheme    string    `yaml:"scheme" json:"scheme"`
 	Tunnels   []*Tunnel `yaml:"tunnels" json:"tunnels"`
@@ -24,7 +26,14 @@ type Config struct {
 
 func (c *Config) Run() {
 	if c.Tun != nil && c.Tun.Enable {
-		c.Tun.Run(c.getScheme(), c.CdnIp, c.GlobalUrl, c.getPort())
+		params := &argo.Params{
+			Scheme:   c.getScheme(),
+			CdnIP:    c.CdnIp,
+			Url:      c.GlobalUrl,
+			Port:     c.getPort(),
+			PoolSize: c.getPoolSize(),
+		}
+		c.Tun.Run(params)
 	}
 
 	for _, tunnel := range c.Tunnels {
@@ -55,6 +64,13 @@ func (c *Config) getPort() int {
 		return 443
 	}
 	return c.CdnPort
+}
+
+func (c *Config) getPoolSize() int32 {
+	if c.PoolSize == 0 {
+		return 10
+	}
+	return c.PoolSize
 }
 
 func (c *Config) getScheme() string {
