@@ -99,6 +99,7 @@ func (w *Websocket) preDial() {
 		}
 		select {
 		case w.connPool <- conn:
+			w.connCount.Add(1)
 			return
 		default:
 			_ = conn.Close()
@@ -139,6 +140,7 @@ func (w *Websocket) Dial(metadata *metadata.Metadata) (conn net.Conn, headerSent
 		err = errors.New("websocket has been closed")
 		return
 	case conn = <-w.connPool:
+		w.connCount.Add(-1)
 		return
 	default:
 		conn, err = w.connect(metadata)
