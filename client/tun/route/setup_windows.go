@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/fmnx/cftun/log"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
