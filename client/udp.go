@@ -35,6 +35,7 @@ type Connector struct {
 	lastRecvTime time.Time
 	idleTimeout  time.Duration
 	closed       bool
+	mu           sync.Mutex
 }
 
 var (
@@ -80,10 +81,17 @@ func UdpListen(config *Config, tunnel *Tunnel) {
 		}
 
 		if conn, ok := udpConns.Load(srcAddr.String()); ok {
-			conn.(*Connector).inboundQueue <- &InboundData{
+			c := conn.(*Connector)
+			c.mu.Lock()
+			if c.closed {
+				c.mu.Unlock()
+				continue
+			}
+			c.inboundQueue <- &InboundData{
 				len: n,
 				buf: buf,
 			}
+			c.mu.Unlock()
 			continue
 		}
 
@@ -139,6 +147,9 @@ func NewConn(ws *Websocket, listener net.PacketConn, srcAddr net.Addr, udpTimeou
 		log.Errorln(err.Error())
 		return nil
 	}
+	if udpTimeout < 1 {
+		udpTimeout = 30
+	}
 	connector := &Connector{
 		listener:     listener,
 		srcAddr:      srcAddr,
@@ -164,8 +175,10 @@ func (c *Connector) healthCheck() {
 	for {
 		if time.Now().After(c.lastRecvTime.Add(c.idleTimeout * time.Second)) {
 			//log.Infoln("UDP: %s -> %s closed.", c.srcAddr.String(), c.listener.LocalAddr().String())
-			close(c.inboundQueue)
+			c.mu.Lock()
 			c.closed = true
+			close(c.inboundQueue)
+			c.mu.Unlock()
 			_ = c.remoteConn.Close()
 			c.udpConns.Delete(c.srcAddr.String())
 			return
