@@ -165,10 +165,10 @@ func (w *Warp) Run() cfd.DialFunc {
 }
 
 func resolvEndpoint(endpoint string) string {
-	c, err := net.DialTimeout("udp", endpoint, 3*time.Second)
-	defer c.Close()
-	if err != nil {
-		return "162.159.192.1:2408"
+	c, _ := net.DialTimeout("udp", endpoint, 3*time.Second)
+	if c != nil {
+		_ = c.Close()
+		return c.RemoteAddr().String()
 	}
-	return c.RemoteAddr().String()
+	return "162.159.192.1:2408"
 }
